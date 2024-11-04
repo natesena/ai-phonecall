@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 
 export async function POST(req: Request) {
+  console.log("Webhook received");
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
@@ -21,6 +22,12 @@ export async function POST(req: Request) {
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
+  console.log("Webhook Headers:", {
+    svix_id,
+    svix_timestamp,
+    svix_signature,
+  });
+
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
     return new Response("Error occured -- no svix headers", {
@@ -31,6 +38,7 @@ export async function POST(req: Request) {
   // Get the body
   const payload = await req.json();
   const body = JSON.stringify(payload);
+  console.log("Webhook Body:", body);
 
   // Create a new SVIX instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -44,6 +52,11 @@ export async function POST(req: Request) {
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     }) as WebhookEvent;
+
+    console.log("Verified Event:", {
+      type: evt.type,
+      data: evt.data
+    });
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
