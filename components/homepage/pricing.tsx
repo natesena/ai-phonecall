@@ -180,8 +180,8 @@ export default function Pricing() {
         "Example Feature Number 2",
         "Example Feature Number 3",
       ],
-      priceId: "price_1QGtDiFMpb9ac8ola5hpxP8r",
-      productId: "prod_R9Bajufbdn4kM1",
+      priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID,
+      productId: process.env.NEXT_PUBLIC_1_CALL_PROD_ID,
       actionLabel: "Get Started",
     },
   ];

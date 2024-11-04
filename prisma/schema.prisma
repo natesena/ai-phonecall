@@ -71,3 +71,13 @@ model invoices {
   email           String
   user_id         String?
 }
+
+model user_credits {
+  id                Int      @id @default(autoincrement())
+  user_id           String   
+  stripe_product_id String   // Stripe's product ID
+  product_name      String   // Name of the product from Stripe
+  amount            Float    // Number of credits remaining
+
+  @@unique([user_id, stripe_product_id])
+}
