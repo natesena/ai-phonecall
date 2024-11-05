@@ -18,6 +18,19 @@ export async function handleCheckoutSessionCompleted(
 
   const metadata: any = session?.metadata;
 
+  // Add stripe_customer_id to user at the start, regardless of payment type
+  if (session.customer && metadata?.userId) {
+    const { error: customerIdError } = await supabase
+      .from("user")
+      .update({ stripe_customer_id: session.customer as string })
+      .eq("user_id", metadata.userId);
+
+    if (customerIdError) {
+      console.error("Error updating stripe_customer_id:", customerIdError);
+      // Continue with the rest of the logic even if this update fails
+    }
+  }
+
   if (metadata?.subscription === "true") {
     // This is for subscription payments
     const subscriptionId = session.subscription;

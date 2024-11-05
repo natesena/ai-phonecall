@@ -4,9 +4,23 @@ import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
-  console.log("Webhook received");
+  const cookieStore = await cookies();
+
+  const supabase: any = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    }
+  );
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
@@ -55,7 +69,7 @@ export async function POST(req: Request) {
 
     console.log("Verified Event:", {
       type: evt.type,
-      data: evt.data
+      data: evt.data,
     });
   } catch (err) {
     console.error("Error verifying webhook:", err);
@@ -67,7 +81,6 @@ export async function POST(req: Request) {
   // Get the ID and type
   const { id } = evt.data;
   const eventType = evt.type;
-
 
   switch (eventType) {
     case "user.created":
@@ -105,6 +118,38 @@ export async function POST(req: Request) {
         return NextResponse.json({
           status: 200,
           message: "User info updated",
+        });
+      } catch (error: any) {
+        return NextResponse.json({
+          status: 400,
+          message: error.message,
+        });
+      }
+      break;
+    case "session.created":
+      try {
+        // Check if user exists first
+        const { data: existingUser } = await supabase
+          .from("user")
+          .select("user_id")
+          .eq("user_id", payload?.data?.id)
+          .single();
+
+        if (!existingUser) {
+          console.log("User does not exist, creating user");
+          // Create user if they don't exist
+          await userCreate({
+            email: payload?.data?.email_addresses?.[0]?.email_address,
+            first_name: payload?.data?.first_name,
+            last_name: payload?.data?.last_name,
+            profile_image_url: payload?.data?.profile_image_url,
+            user_id: payload?.data?.id,
+          });
+        }
+
+        return NextResponse.json({
+          status: 200,
+          message: "User sign in handled",
         });
       } catch (error: any) {
         return NextResponse.json({

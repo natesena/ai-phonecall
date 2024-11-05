@@ -6,12 +6,7 @@ import { handleSubscriptionEvent } from "./handleSubscriptionEvent";
 import { handleInvoiceEvent } from "./handleInvoiceEvent";
 import { handleCheckoutSessionCompleted } from "./handleCheckoutSessionCompleted";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-// At the top of your file, define the credit mapping
-const PRICE_TO_CREDITS: Record<string, number> = {
-  price_1QHVBkFMpb9ac8oli1eIxXb1: 1, // Replace with your actual Stripe price IDs
-};
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // At the top of your file, define the credit mapping
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();

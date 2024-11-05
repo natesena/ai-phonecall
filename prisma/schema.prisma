@@ -17,7 +17,7 @@ model user {
   gender            String?
   profile_image_url String?
   user_id           String   @unique
-  subscription      String?
+  stripe_customer_id String?  @unique
 }
 
 model payments {

@@ -6,9 +6,27 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(req: NextRequest) {
   const { userId, email, priceId, subscription } = await req.json();
 
+  let customerId;
+  try {
+    const customers = await stripe.customers.list({ email: email, limit: 1 });
+    customerId = customers.data[0]?.id;
+
+    if (!customerId) {
+      const customer = await stripe.customers.create({
+        email: email,
+        metadata: { userId },
+      });
+      customerId = customer.id;
+    }
+  } catch (error) {
+    console.error("Error handling customer:", error);
+    return NextResponse.json({ error: "Failed to handle customer" });
+  }
+
   if (subscription) {
     try {
       const session = await stripe.checkout.sessions.create({
+        customer: customerId,
         payment_method_types: ["card"],
         line_items: [{ price: priceId, quantity: 1 }],
         metadata: { userId, email, subscription },
@@ -18,7 +36,6 @@ export async function POST(req: NextRequest) {
         allow_promotion_codes: true,
       });
 
-
       return NextResponse.json({ sessionId: session.id });
     } catch (error) {
       console.error("Error creating checkout session:", error);
@@ -27,6 +44,7 @@ export async function POST(req: NextRequest) {
   } else {
     try {
       const session = await stripe.checkout.sessions.create({
+        customer: customerId,
         payment_method_types: ["card"],
         line_items: [{ price: priceId, quantity: 1 }],
         metadata: { userId, email, subscription },

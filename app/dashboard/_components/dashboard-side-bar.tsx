@@ -15,7 +15,7 @@ export default function DashboardSideBar() {
       <div className="flex h-full max-h-screen flex-col gap-2 ">
         <div className="flex h-[55px] items-center justify-between border-b px-3 w-full">
           <Link className="flex items-center gap-2 font-semibold ml-1" href="/">
-            <span className="">Nextjs Starter Kit</span>
+            <span className="">AI-Phonecall</span>
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2 ">
@@ -28,12 +28,12 @@ export default function DashboardSideBar() {
                     pathname === "/dashboard",
                 }
               )}
-              href="/dashboard"
+              href="/dashboard/transactions"
             >
               <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
-                <HomeIcon className="h-3 w-3" />
+                <Banknote className="h-3 w-3" />
               </div>
-              Home
+              Transactions
             </Link>
 
             <Separator className="my-3" />
