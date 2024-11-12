@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   try {
     const { data: credits, error } = await supabase
       .from("user_credits")
-      .select("*")
+      .select("product_name, amount")
       .eq("user_id", userId);
 
     if (error) {
