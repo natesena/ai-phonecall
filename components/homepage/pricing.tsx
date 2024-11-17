@@ -17,7 +17,6 @@ import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
-import { TITLE_TAILWIND_CLASS } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 
 type PricingSwitchProps = {
@@ -36,24 +35,6 @@ type PricingCardProps = {
   exclusive?: boolean;
   priceId: string;
 };
-
-const PricingHeader = ({
-  title,
-  subtitle,
-}: {
-  title: string;
-  subtitle: string;
-}) => (
-  <section className="text-center">
-    <h1
-      className={`${TITLE_TAILWIND_CLASS} mt-2 font-semibold tracking-tight dark:text-white text-gray-900`}
-    >
-      {title}
-    </h1>
-    <p className="text-gray-600 dark:text-gray-400 pt-1">{subtitle}</p>
-    <br />
-  </section>
-);
 
 const PricingCard = ({
   user,
@@ -172,26 +153,22 @@ export default function Pricing() {
 
   const plans = [
     {
-      title: "Basic",
-      price: 10,
+      title: "Call Santa",
+      price: 5,
       description: "Essential features you need to get started",
       features: [
-        "Example Feature Number 1",
-        "Example Feature Number 2",
-        "Example Feature Number 3",
+        "1x 5 minute call with Santa",
+        "No milk & cookies necessary",
+        "Chimney-proof guarantee",
       ],
       priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID,
       productId: process.env.NEXT_PUBLIC_1_CALL_PROD_ID,
-      actionLabel: "Get Started",
+      actionLabel: "Buy Credit",
     },
   ];
 
   return (
     <div>
-      <PricingHeader
-        title="Sample Pricing Plans"
-        subtitle="Use these sample pricing cards in your SAAS"
-      />
       <section className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-8 mt-8">
         {plans.map((plan) => {
           return (

@@ -20,14 +20,25 @@ export async function GET(request: Request) {
     }
 
     // First get the stripe_customer_id from the user record
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
+
     const supabase = createServerClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_KEY!,
       {
         cookies: {
           get(name: string) {
-            return cookieStore.get(name)?.value;
+            return cookies().get(name)?.value;
+          },
+          set(
+            name: string,
+            value: string,
+            options: { path?: string; maxAge?: number }
+          ) {
+            cookies().set(name, value, options);
+          },
+          remove(name: string, options: { path?: string }) {
+            cookies().set(name, "", options);
           },
         },
       }

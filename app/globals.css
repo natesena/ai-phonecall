@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -30,7 +29,6 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-
   }
 
   .dark {
@@ -58,7 +56,6 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-
   }
 }
 
@@ -69,4 +66,38 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+main {
+  background: rgb(156, 0, 0);
+  background: -moz-linear-gradient(
+    180deg,
+    rgba(156, 0, 0, 1) 0%,
+    rgba(136, 0, 0, 1) 56%,
+    rgba(113, 0, 0, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    180deg,
+    rgba(156, 0, 0, 1) 0%,
+    rgba(136, 0, 0, 1) 56%,
+    rgba(113, 0, 0, 1) 100%
+  );
+  background: linear-gradient(
+    180deg,
+    rgba(156, 0, 0, 1) 0%,
+    rgba(136, 0, 0, 1) 56%,
+    rgba(113, 0, 0, 1) 100%
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#9c0000",endColorstr="#710000",GradientType=1);
+}
+
+.lobster-regular {
+  font-family: "Lobster", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.hero-title,
+.hero-subtitle {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }

@@ -1,7 +1,13 @@
-import { ChevronDown, Phone, Play, Pause } from "lucide-react";
+import { ChevronDown, Phone, Play, Pause, Download } from "lucide-react";
 import { useState, useRef } from "react";
 import WaveformPlayer from "./WaveformPlayer";
-import { formatDistance, differenceInSeconds, parseISO } from "date-fns";
+import {
+  formatDistance,
+  differenceInSeconds,
+  parseISO,
+  format,
+} from "date-fns";
+import { Button } from "@/components/ui/button";
 
 interface CallLogProps {
   call: any;
@@ -43,6 +49,26 @@ export default function CallLog({ call }: CallLogProps) {
     }
   };
 
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(call.artifact.stereoRecordingUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `call-${format(
+        parseISO(call.startedAt),
+        "yyyy-MM-dd-HH-mm"
+      )}.wav`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+
   return (
     <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-center">
@@ -69,10 +95,36 @@ export default function CallLog({ call }: CallLogProps) {
       {isExpanded && (
         <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
           {/* Audio Player */}
-          <WaveformPlayer audioUrl={call.artifact.stereoRecordingUrl} />
-          <pre className="whitespace-pre-wrap break-words text-sm">
+          {durationInSeconds > 0 ? (
+            <>
+              <div className="space-y-4">
+                <WaveformPlayer audioUrl={call.artifact.stereoRecordingUrl} />
+                <div className="flex justify-end">
+                  <Button onClick={handleDownload} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                {call.transcript
+                  ?.split("\n")
+                  .map((line: string, index: number) => (
+                    <p key={index} className="text-sm">
+                      {line}
+                    </p>
+                  ))}
+              </div>
+            </>
+          ) : (
+            <div>
+              This call seems to have not happened. There is no audio and you
+              were not charged for the call.
+            </div>
+          )}
+          {/* <pre className="whitespace-pre-wrap break-words text-sm mt-4">
             {JSON.stringify(call, null, 2)}
-          </pre>
+          </pre> */}
         </div>
       )}
     </div>
