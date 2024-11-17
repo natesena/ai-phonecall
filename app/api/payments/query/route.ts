@@ -28,17 +28,17 @@ export async function GET(request: Request) {
       {
         cookies: {
           get(name: string) {
-            return cookies().get(name)?.value;
+            return cookieStore.get(name)?.value;
           },
           set(
             name: string,
             value: string,
             options: { path?: string; maxAge?: number }
           ) {
-            cookies().set(name, value, options);
+            cookieStore.set(name, value, options);
           },
           remove(name: string, options: { path?: string }) {
-            cookies().set(name, "", options);
+            cookieStore.set(name, "", options);
           },
         },
       }

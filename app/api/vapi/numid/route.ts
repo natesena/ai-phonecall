@@ -24,13 +24,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const allCalls = await response.json();
+    const allCalls: Record<string, any>[] = await response.json();
 
-    // Filter calls to only include those from the user's phone numbers
-    const filteredCalls = allCalls.filter((call) =>
-      phoneNumbersArray.includes(call.customer?.number)
+    // Filter calls to only include those from the user's phone number
+    const filteredCalls = (allCalls as Record<string, any>[]).filter(
+      (call: Record<string, any>) =>
+        phoneNumbersArray.includes(call.customer?.number)
     );
-
     const filteredPhoneNumber = filteredCalls[0].customer.number;
     const filteredPhoneNumberId = filteredCalls[0].phoneNumberId;
 

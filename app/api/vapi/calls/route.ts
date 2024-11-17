@@ -21,11 +21,11 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const allCalls = await response.json();
+    const allCalls: Record<string, any>[] = await response.json();
 
     // Filter calls to only include those from the user's phone number
-    const filteredCalls = allCalls.filter((call) =>
-      phoneNumber.includes(call.customer?.number)
+    const filteredCalls = (allCalls as Record<string, any>[]).filter(
+      (call: Record<string, any>) => phoneNumber.includes(call.customer?.number)
     );
 
     console.log("Filtered calls for", phoneNumber, filteredCalls);

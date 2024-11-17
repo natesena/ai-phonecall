@@ -161,8 +161,8 @@ export default function Pricing() {
         "No milk & cookies necessary",
         "Chimney-proof guarantee",
       ],
-      priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID,
-      productId: process.env.NEXT_PUBLIC_1_CALL_PROD_ID,
+      priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID as string,
+      productId: process.env.NEXT_PUBLIC_1_CALL_PROD_ID as string,
       actionLabel: "Buy Credit",
     },
   ];
@@ -171,6 +171,7 @@ export default function Pricing() {
     <div>
       <section className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-8 mt-8">
         {plans.map((plan) => {
+          if (!plan.priceId) return null;
           return (
             <PricingCard
               user={user}

@@ -3,12 +3,14 @@ import WaveSurfer from "wavesurfer.js";
 import { Button } from "@/components/ui/button";
 import { Play, Pause } from "lucide-react";
 
-const Waveform = ({ audioUrl }) => {
-  const waveformRef = useRef(null);
-  const wavesurferRef = useRef(null);
+const Waveform = ({ audioUrl }: { audioUrl: string }) => {
+  const waveformRef = useRef<HTMLDivElement>(null);
+  const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
+    if (!waveformRef.current) return;
+
     const wavesurfer = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: "#A8DBA8",
@@ -16,17 +18,13 @@ const Waveform = ({ audioUrl }) => {
       cursorColor: "#3B8686",
       barWidth: 3,
       barRadius: 3,
-      responsive: true,
       height: 150,
       normalize: true,
-      partialRender: true,
     });
 
     wavesurfer.load(audioUrl);
 
-    wavesurfer.on("ready", () => {
-      wavesurferRef.current = wavesurfer;
-    });
+    wavesurferRef.current = wavesurfer;
 
     return () => wavesurfer.destroy();
   }, [audioUrl]);

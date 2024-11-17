@@ -99,7 +99,9 @@ export async function handleCheckoutSessionCompleted(
       }
 
       const priceId = session.line_items?.data[0]?.price?.id;
-      const stripeProductId = session.line_items?.data[0]?.price?.product?.id;
+      const stripeProductId = (
+        session.line_items?.data[0]?.price?.product as Stripe.Product
+      )?.id;
       const productName = (
         session.line_items?.data[0]?.price?.product as Stripe.Product
       )?.name;
