@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "@/components/wrapper/Navbar";
+import Navbar from "@/components/wrapper/navbar";
 
 export default function RootLayout({
   children,
