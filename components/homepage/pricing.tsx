@@ -11,13 +11,12 @@ import {
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Band } from "@/components/ui/band";
+import { Band } from "@/components/homepage/band";
 
 type PricingSwitchProps = {
   onSwitch: (value: string) => void;
@@ -162,23 +161,24 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="relative z-[5] mt-32">
-      <Band>
-        <section className="flex flex-row justify-center gap-8 h-full items-center">
-          {plans.map((plan) => {
-            if (!plan.priceId) return null;
-            return (
-              <div className="relative" key={plan.title}>
-                <PricingCard
-                  user={user}
-                  handleCheckout={handleCheckout}
-                  {...plan}
-                />
-              </div>
-            );
-          })}
-        </section>
-      </Band>
+    <div className="pricing-section relative w-full z-[5] mt-4">
+      <div className="band-container absolute left-0 top-1/2 -translate-y-1/2 w-full overflow-x-hidden">
+        <Band />
+      </div>
+      <section className="relative z-10 flex flex-row justify-center gap-8 w-full">
+        {plans.map((plan) => {
+          if (!plan.priceId) return null;
+          return (
+            <div className="relative" key={plan.title}>
+              <PricingCard
+                user={user}
+                handleCheckout={handleCheckout}
+                {...plan}
+              />
+            </div>
+          );
+        })}
+      </section>
     </div>
   );
 }

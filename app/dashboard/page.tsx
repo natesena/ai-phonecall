@@ -45,6 +45,7 @@ export default function OverviewPage() {
 
         const calls = await callsResponse.json();
         const transactions = await transactionsResponse.json();
+
         // Transform calls and transactions into timeline items
         const callItems: TimelineItem[] = calls.map((call: any) => ({
           type: "call",
