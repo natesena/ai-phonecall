@@ -50,8 +50,8 @@ export function AccordionComponent() {
           </AccordionTrigger>
           <AccordionContent>
             <p className="accordion-answer">
-              Yes, there is a "calls" section in the dashboard where you can
-              read the transcript and download a .wav file of your call.
+              Yes, there is a &quot;calls&quot; section in the dashboard where
+              you can read the transcript and download a .wav file of your call.
             </p>
           </AccordionContent>
         </AccordionItem>
