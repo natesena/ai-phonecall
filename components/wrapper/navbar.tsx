@@ -22,7 +22,7 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-export default function NavBar() {
+export default function Navbar() {
   let userId = null;
   /* eslint-disable react-hooks/rules-of-hooks */
   if (config?.auth?.enabled) {
@@ -31,7 +31,7 @@ export default function NavBar() {
   }
 
   return (
-    <div className="flex min-w-full fixed justify-between p-2 border-b z-10 dark:bg-black dark:bg-opacity-50 bg-white">
+    <div className="navbar flex min-w-full fixed justify-between p-2 border-b z-50 dark:bg-black dark:bg-opacity-50 bg-white">
       <NavigationMenu>
         <NavigationMenuList className="flex gap-3 w-[100%] justify-between">
           <Link href="/" className="pl-2 flex items-center" aria-label="Home">
@@ -40,12 +40,12 @@ export default function NavBar() {
           </Link>
           {userId && (
             <Link href="/dashboard" legacyBehavior passHref>
-              <Button variant="ghost">Dashboard</Button>
+              <Button variant="ghost">Dash-ing-board</Button>
             </Link>
           )}
         </NavigationMenuList>
       </NavigationMenu>
-      <div className="flex items-center gap-2 max-[825px]:hidden">
+      <div className="flex items-center gap-2">
         {userId ? (
           <UserProfile />
         ) : (

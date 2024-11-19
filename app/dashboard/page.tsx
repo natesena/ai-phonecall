@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
-import { Banknote } from "lucide-react";
 import CallLog from "./calls/_components/CallLog";
+import TransactionItem from "./transactions/_components/TransactionItem";
+import { Loading } from "@/components/loading";
+import ErrorPage from "@/components/errorpage/ErrorPage";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
 
@@ -88,33 +90,17 @@ export default function OverviewPage() {
     {}
   );
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-  const TransactionItem = ({ transaction }: { transaction: Transaction }) => (
-    <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
-            <Banknote className="h-4 w-4 text-gray-600" />
-          </div>
-          <span className="font-medium">
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: transaction.currency,
-            }).format(transaction.amount)}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
+  if (loading) return <Loading />;
+  if (error) return <ErrorPage />;
 
   return (
-    <div className="space-y-8 p-6">
-      <h1 className="text-2xl font-bold mb-6">Activity Overview</h1>
+    <div className="dashboard-page container mx-auto max-w-4xl space-y-8 p-6">
+      <h1 className="text-2xl font-bold mb-6 text-white text-shadow-lg">
+        Activity Overview
+      </h1>
       {Object.entries(groupedItems).map(([date, items]) => (
         <div key={date}>
-          <h3 className="text-lg font-semibold mb-4">
+          <h3 className="text-lg font-semibold mb-4 text-white text-shadow-lg">
             {format(parseISO(date), "MMMM d, yyyy")}
           </h3>
           <div className="space-y-4">

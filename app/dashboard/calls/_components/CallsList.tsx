@@ -23,7 +23,7 @@ export default function CallsList({ calls }: CallsListProps) {
     <div className="space-y-8">
       {Object.entries(groupedCalls).map(([date, dateCalls]) => (
         <div key={date}>
-          <h3 className="text-lg font-semibold mb-4">
+          <h3 className="text-lg font-semibold mb-4 text-white text-shadow-lg">
             {format(parseISO(date), "MMMM d, yyyy")}
           </h3>
           <div className="space-y-4">

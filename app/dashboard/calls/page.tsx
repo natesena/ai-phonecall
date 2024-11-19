@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import CallsList from "./_components/CallsList";
 import { useUser } from "@clerk/nextjs";
-
+import { Loading } from "@/components/loading";
 export default function CallsPage() {
   const [calls, setCalls] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,9 +42,13 @@ export default function CallsPage() {
     fetchCalls();
   }, [user, isLoaded]);
 
-  if (!isLoaded) return <div>Loading user...</div>;
-  if (loading) return <div>Loading calls...</div>;
+  if (!isLoaded) return <Loading />;
+  if (loading) return <Loading />;
   if (error) return <div>Error: {error}</div>;
 
-  return <div>{calls.length > 0 && <CallsList calls={calls} />}</div>;
+  return (
+    <div className="container mx-auto max-w-4xl space-y-8 overflow-hidden">
+      {calls.length > 0 && <CallsList calls={calls} />}
+    </div>
+  );
 }

@@ -55,10 +55,35 @@ export default function SnowScene() {
       canvas.height = diameter;
       const canvasRadius = diameter / 2;
 
-      drawRadialGradation(ctx, canvasRadius, canvas.width, canvas.height);
+      // Clear the canvas first
+      ctx.clearRect(0, 0, diameter, diameter);
+
+      // Create a radial gradient with sharper falloff
+      const gradient = ctx.createRadialGradient(
+        canvasRadius,
+        canvasRadius,
+        0,
+        canvasRadius,
+        canvasRadius,
+        canvasRadius
+      );
+
+      // Adjust gradient stops for better circle definition
+      gradient.addColorStop(0, "rgba(255,255,255,1.0)");
+      gradient.addColorStop(0.3, "rgba(255,255,255,0.8)");
+      gradient.addColorStop(0.5, "rgba(255,255,255,0.3)");
+      gradient.addColorStop(0.7, "rgba(255,255,255,0.1)");
+      gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+      ctx.fillStyle = gradient;
+
+      // Draw a circle instead of a rectangle
+      ctx.beginPath();
+      ctx.arc(canvasRadius, canvasRadius, canvasRadius, 0, Math.PI * 2);
+      ctx.fill();
 
       const texture = new THREE.Texture(canvas);
-      texture.type = THREE.FloatType;
+      texture.premultiplyAlpha = true;
       texture.needsUpdate = true;
       return texture;
     };
@@ -102,7 +127,7 @@ export default function SnowScene() {
     const init = () => {
       // Scene setup
       scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x000036, 0, minRange * 3);
+      scene.fog = new THREE.Fog(0x000036, 0, minRange * 2);
 
       // Get container dimensions
       const width = containerRef.current?.clientWidth || window.innerWidth;
@@ -182,6 +207,10 @@ export default function SnowScene() {
         transparent: true,
         fog: true,
         depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        opacity: 0.8,
+        alphaTest: 0.1,
+        sizeAttenuation: true,
       });
 
       particles = new THREE.Points(pointGeometry, pointMaterial);

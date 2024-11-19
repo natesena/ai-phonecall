@@ -70,7 +70,7 @@ export default function CallLog({ call }: CallLogProps) {
   };
 
   return (
-    <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">

@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 const siteDescription = "Have a real phone call with Santa.";
-const siteName = "Santa Call";
+const siteName = "CallSanta.Shop";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://starter.rasmic.xyz"),

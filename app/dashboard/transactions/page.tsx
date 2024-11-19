@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { formatDistance } from "date-fns";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { Loading } from "@/components/loading";
 
 interface Transaction {
   stripe_id: string;
@@ -45,10 +46,14 @@ export default function TransactionsPage() {
     }
   }, [userId]);
 
+  if (isLoading) return <Loading />;
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Transaction History</h1>
-      <div className="rounded-md border">
+    <div className="p-6 container mx-auto max-w-4xl space-y-8 p-6">
+      <h1 className="text-2xl font-bold mb-6 text-white text-shadow-lg">
+        Transaction History
+      </h1>
+      <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
             <TableRow>

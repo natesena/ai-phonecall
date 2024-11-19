@@ -1,6 +1,5 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Band } from "@/components/ui/band";
 
 type PricingSwitchProps = {
   onSwitch: (value: string) => void;
@@ -50,59 +50,53 @@ const PricingCard = ({
 }: PricingCardProps) => {
   const router = useRouter();
   return (
-    <Card
-      className={cn(
-        `w-72 flex flex-col justify-between py-1 ${
-          popular ? "border-rose-400" : "border-zinc-700"
-        } mx-auto sm:mx-0`,
-        {
-          "animate-background-shine bg-white dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] transition-colors":
-            exclusive,
-        }
-      )}
-    >
-      <div>
-        <CardHeader className="pb-8 pt-4">
-          <CardTitle className="text-zinc-700 dark:text-zinc-300 text-lg">
-            {title}
-          </CardTitle>
+    <div className="relative">
+      <div className="shiny-border rounded-lg p-[20px]">
+        <Card className="pricing w-72 flex flex-col justify-between py-1 mx-auto sm:mx-0 bg-white dark:bg-zinc-900">
+          <div>
+            <CardHeader className="pb-8 pt-4">
+              <CardTitle className="text-zinc-700 dark:text-zinc-300 text-lg">
+                {title}
+              </CardTitle>
 
-          <div className="flex gap-0.5">${price}</div>
-          <CardDescription className="pt-1.5 h-12">
-            {description}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          {features.map((feature: string) => (
-            <CheckItem key={feature} text={feature} />
-          ))}
-        </CardContent>
+              <div className="flex gap-0.5">${price}</div>
+              <CardDescription className="pt-1.5 h-12">
+                {description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2">
+              {features.map((feature: string) => (
+                <CheckItem key={feature} text={feature} />
+              ))}
+            </CardContent>
+          </div>
+          <CardFooter className="mt-2">
+            <Button
+              onClick={() => {
+                if (user?.id) {
+                  handleCheckout(price, priceId);
+                } else {
+                  toast("Please login or sign up to purchase", {
+                    description: "You must be logged in to make a purchase",
+                    action: {
+                      label: "Sign Up",
+                      onClick: () => {
+                        router.push("/sign-up");
+                      },
+                    },
+                  });
+                }
+              }}
+              className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
+              type="button"
+            >
+              <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur" />
+              {actionLabel}
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
-      <CardFooter className="mt-2">
-        <Button
-          onClick={() => {
-            if (user?.id) {
-              handleCheckout(price, priceId);
-            } else {
-              toast("Please login or sign up to purchase", {
-                description: "You must be logged in to make a purchase",
-                action: {
-                  label: "Sign Up",
-                  onClick: () => {
-                    router.push("/sign-up");
-                  },
-                },
-              });
-            }
-          }}
-          className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
-          type="button"
-        >
-          <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b fr om-[#c7d2fe] to-[#8678f9] opacity-75 blur" />
-          {actionLabel}
-        </Button>
-      </CardFooter>
-    </Card>
+    </div>
   );
 };
 
@@ -168,20 +162,23 @@ export default function Pricing() {
   ];
 
   return (
-    <div>
-      <section className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-8 mt-8">
-        {plans.map((plan) => {
-          if (!plan.priceId) return null;
-          return (
-            <PricingCard
-              user={user}
-              handleCheckout={handleCheckout}
-              key={plan.title}
-              {...plan}
-            />
-          );
-        })}
-      </section>
+    <div className="relative z-[5] mt-32">
+      <Band>
+        <section className="flex flex-row justify-center gap-8 h-full items-center">
+          {plans.map((plan) => {
+            if (!plan.priceId) return null;
+            return (
+              <div className="relative" key={plan.title}>
+                <PricingCard
+                  user={user}
+                  handleCheckout={handleCheckout}
+                  {...plan}
+                />
+              </div>
+            );
+          })}
+        </section>
+      </Band>
     </div>
   );
 }
