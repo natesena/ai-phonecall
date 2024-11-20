@@ -6,7 +6,22 @@ import config from "@/config";
 import SnowScene from "@/components/homepage/three/snowScene";
 import AudioPlayer from "@/components/homepage/audio-player";
 import HowTo from "@/components/homepage/howto/howto";
-export default function Home() {
+import prisma from "@/lib/prisma";
+import { formatNumber } from "@/lib/utils";
+
+async function getCallCount() {
+  try {
+    const count = await prisma.call.count();
+    return count;
+  } catch (error) {
+    console.error("Failed to get call count:", error);
+    return 1000000; // Fallback number
+  }
+}
+
+export default async function Home() {
+  const count = await getCallCount();
+
   return (
     <PageWrapper showFooter={true}>
       <div className="fixed bottom-4 right-4 z-50">
@@ -26,7 +41,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
               <p className="lobster-regular text-center text-5xl text-white">
-                1,000,000 calls and counting!
+                {formatNumber(count)} calls and counting!
               </p>
             </div>
             <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
