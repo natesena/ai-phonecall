@@ -1,71 +1,78 @@
-import { ChevronDown, Phone, Play, Pause, Download } from "lucide-react";
-import { useState, useRef } from "react";
-import WaveformPlayer from "./WaveformPlayer";
-import {
-  formatDistance,
-  differenceInSeconds,
-  parseISO,
-  format,
-} from "date-fns";
+import { Call } from "@prisma/client";
+import { Phone, ChevronDown, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect, use } from "react";
+import WaveformPlayer from "./WaveformPlayer";
+
+// Extend the Prisma Call type with VAPI-specific fields
+interface CallWithArtifacts extends Call {
+  artifact?: {
+    recordingUrl: string;
+    stereoRecordingUrl: string;
+    transcript: string;
+  };
+  customer?: {
+    number: string;
+  };
+}
 
 interface CallLogProps {
-  call: any;
+  call: CallWithArtifacts;
 }
 
 export default function CallLog({ call }: CallLogProps) {
+  const [fullCall, setFullCall] = useState<CallWithArtifacts>(call);
+  const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Approach 1: Get duration in seconds
-  const durationInSeconds = differenceInSeconds(
-    parseISO(call.endedAt),
-    parseISO(call.startedAt)
-  );
+  useEffect(() => {
+    async function fetchVapiCall() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/vapi/call/${call.callId}`);
+        if (!response.ok) throw new Error("Failed to fetch call details");
 
-  // Format seconds into mm:ss
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
+        const data = await response.json();
 
-  // Approach 2: Get human readable distance
-  const duration = formatDistance(
-    parseISO(call.startedAt),
-    parseISO(call.endedAt),
-    { includeSeconds: true }
-  );
-
-  const togglePlayback = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+        // Update the call with VAPI data
+        setFullCall((prev) => ({
+          ...prev,
+          artifact: {
+            recordingUrl: data.recordingUrl || "",
+            stereoRecordingUrl: data.stereoRecordingUrl || "",
+            transcript: data.transcript || "",
+          },
+          customer: {
+            number: data.customer?.number || prev.customer?.number || "",
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching VAPI call:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsPlaying(!isPlaying);
     }
-  };
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(call.artifact.stereoRecordingUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `call-${format(
-        parseISO(call.startedAt),
-        "yyyy-MM-dd-HH-mm"
-      )}.wav`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error("Error downloading file:", error);
+    if (process.env.NEXT_PUBLIC_SHOW_VAPI_CALL_DETAILS) {
+      fetchVapiCall();
+    }
+  }, [call.callId]); // Only re-run if callId changes
+
+  const durationInSeconds = fullCall.durationSeconds || 0;
+  const hasArtifacts = Boolean(fullCall.artifact);
+  const hasRecording = Boolean(fullCall.artifact?.stereoRecordingUrl);
+  const hasTranscript = Boolean(fullCall.artifact?.transcript);
+  console.log(fullCall);
+  const duration =
+    durationInSeconds > 0
+      ? `${Math.floor(durationInSeconds / 60)}:${(durationInSeconds % 60)
+          .toString()
+          .padStart(2, "0")}`
+      : "0:00";
+
+  const handleDownload = () => {
+    if (hasRecording) {
+      window.open(fullCall.artifact!.stereoRecordingUrl, "_blank");
     }
   };
 
@@ -76,45 +83,58 @@ export default function CallLog({ call }: CallLogProps) {
           <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
             <Phone className="h-4 w-4 text-gray-600" />
           </div>
-          <span className="text-sm text-gray-500">{call.customer?.number}</span>
+          <span className="text-sm text-gray-500">
+            {fullCall.customer?.number || fullCall.customerPhone}
+          </span>
           <span className="font-medium">
             Duration: {formatDuration(durationInSeconds)}
           </span>
           <span className="text-sm text-gray-500">({duration})</span>
         </div>
 
-        <ChevronDown
-          className={`h-5 w-5 cursor-pointer transition-transform duration-200 ${
-            isExpanded ? "transform rotate-180" : ""
-          }`}
-          onClick={() => setIsExpanded(!isExpanded)}
-        />
+        {hasArtifacts && (
+          <ChevronDown
+            className={`h-5 w-5 cursor-pointer transition-transform duration-200 ${
+              isExpanded ? "transform rotate-180" : ""
+            }`}
+            onClick={() => setIsExpanded(!isExpanded)}
+          />
+        )}
       </div>
 
-      {/* Dropdown Content */}
-      {isExpanded && (
+      {isExpanded && hasArtifacts && (
         <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
-          {/* Audio Player */}
           {durationInSeconds > 0 ? (
             <>
-              <div className="space-y-4">
-                <WaveformPlayer audioUrl={call.artifact.stereoRecordingUrl} />
-                <div className="flex justify-end">
-                  <Button onClick={handleDownload} variant="outline" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </Button>
+              {hasRecording && (
+                <div className="space-y-4">
+                  <WaveformPlayer
+                    audioUrl={fullCall.artifact!.stereoRecordingUrl}
+                  />
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={handleDownload}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4 space-y-2">
-                {call.transcript
-                  ?.split("\n")
-                  .map((line: string, index: number) => (
-                    <p key={index} className="text-sm">
-                      {line}
-                    </p>
-                  ))}
-              </div>
+              )}
+
+              {hasTranscript && (
+                <div className="mt-4 space-y-2">
+                  {fullCall
+                    .artifact!.transcript.split("\n")
+                    .map((line: string, index: number) => (
+                      <p key={index} className="text-sm">
+                        {line}
+                      </p>
+                    ))}
+                </div>
+              )}
             </>
           ) : (
             <div>
@@ -122,11 +142,15 @@ export default function CallLog({ call }: CallLogProps) {
               were not charged for the call.
             </div>
           )}
-          {/* <pre className="whitespace-pre-wrap break-words text-sm mt-4">
-            {JSON.stringify(call, null, 2)}
-          </pre> */}
         </div>
       )}
     </div>
   );
+}
+
+function formatDuration(seconds: number): string {
+  if (seconds === 0) return "0:00";
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 }

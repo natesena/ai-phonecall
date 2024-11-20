@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
-import CallLog from "./calls/_components/CallLog";
+import CallLog from "@/app/dashboard/calls/_components/CallLog";
 import TransactionItem from "./transactions/_components/TransactionItem";
 import { Loading } from "@/components/loading";
 import ErrorPage from "@/components/errorpage/ErrorPage";
@@ -39,27 +39,39 @@ export default function OverviewPage() {
 
         // Fetch both calls and transactions
         const [callsResponse, transactionsResponse] = await Promise.all([
-          fetch(`/api/vapi/calls?phoneNumber=${encodeURIComponent(number)}`),
-          fetch(`/api/payments/query?userId=${userId}`),
+          fetch(`/api/calls`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ phoneNumber: number }),
+          }),
+          fetch("/api/payments/query"),
         ]);
 
         const calls = await callsResponse.json();
         const transactions = await transactionsResponse.json();
 
-        // Transform calls and transactions into timeline items
-        const callItems: TimelineItem[] = calls.map((call: any) => ({
-          type: "call",
-          date: call.startedAt,
-          data: call,
-        }));
+        console.log(calls);
+        console.log(transactions);
 
-        const transactionItems: TimelineItem[] = transactions.transactions.map(
-          (transaction: Transaction) => ({
-            type: "transaction",
-            date: transaction.payment_time,
-            data: transaction,
-          })
-        );
+        // Safely handle calls response
+        const callItems: TimelineItem[] = Array.isArray(calls)
+          ? calls.map((call: any) => ({
+              type: "call",
+              date: call.startedAt,
+              data: call,
+            }))
+          : [];
+
+        // Safely handle transactions response
+        const transactionItems: TimelineItem[] = transactions?.transactions
+          ? transactions.transactions.map((transaction: Transaction) => ({
+              type: "transaction",
+              date: transaction.payment_time,
+              data: transaction,
+            }))
+          : [];
 
         // Combine and sort all items by date
         const allItems = [...callItems, ...transactionItems].sort(

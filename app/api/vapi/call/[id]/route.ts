@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { userId } = await auth();
     if (!userId) {
@@ -9,17 +12,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { phoneNumber } = await request.json();
-
-    if (!phoneNumber) {
+    // Get ID from route params instead of search params
+    const callId = params.id;
+    if (!callId) {
       return NextResponse.json(
-        { error: "Phone number is required" },
+        { error: "Call ID is required" },
         { status: 400 }
       );
     }
 
-    // Fetch calls from VAPI
-    const response = await fetch("https://api.vapi.ai/call", {
+    console.log("Fetching call:", callId); // Debug log
+
+    // Fetch call from VAPI
+    const response = await fetch(`https://api.vapi.ai/call/${callId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${process.env.VAPI_API_KEY}`,
@@ -28,24 +33,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("VAPI Error:", errorText);
       throw new Error(`VAPI responded with status: ${response.status}`);
     }
 
-    const vapiData = await response.json();
-
-    // Ensure we always return an array, even if empty
-    return NextResponse.json({
-      calls: Array.isArray(vapiData) ? vapiData : [],
-    });
+    const call = await response.json();
+    return NextResponse.json(call);
   } catch (error) {
     console.error("VAPI API Error:", {
       error,
-      path: "/api/vapi/calls",
-      phoneNumber: request.body,
+      path: `/api/vapi/call/${params.id}`,
     });
 
     return NextResponse.json(
-      { error: "Failed to fetch calls from VAPI" },
+      { error: "Failed to fetch single call from VAPI" },
       { status: 500 }
     );
   }

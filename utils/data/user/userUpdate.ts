@@ -1,7 +1,6 @@
 "server only";
 import { userUpdateProps } from "@/utils/types";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
 
 export const userUpdate = async ({
   email,
@@ -10,39 +9,33 @@ export const userUpdate = async ({
   profile_image_url,
   user_id,
 }: userUpdateProps) => {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-
   try {
-    const { data, error } = await supabase
-      .from("user")
-      .update([
-        {
-          email,
-          first_name,
-          last_name,
-          profile_image_url,
-          user_id,
-        },
-      ])
-      .eq("email", email)
-      .select();
+    const data = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        first_name,
+        last_name,
+        profile_image_url,
+        user_id,
+      },
+    });
 
-    if (data) return data;
-
-    if (error) return error;
+    return data;
   } catch (error: any) {
+    console.error("Error updating user:", {
+      message: error.message,
+      code: error.code,
+    });
+
+    if (error.code === "P2025") {
+      return {
+        code: "P2025",
+        message: "User not found with this email",
+      };
+    }
+
     throw new Error(error.message);
   }
 };

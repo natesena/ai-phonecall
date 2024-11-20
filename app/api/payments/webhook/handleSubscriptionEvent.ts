@@ -1,12 +1,11 @@
 import Stripe from "stripe";
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { getCustomerEmail } from "./getCustomerEmail";
+import prisma from "@/lib/prisma";
 
 export async function handleSubscriptionEvent(
   event: Stripe.Event,
   type: "created" | "updated" | "deleted",
-  supabase: ReturnType<typeof createServerClient>,
   stripe: Stripe
 ) {
   const subscription = event.data.object as Stripe.Subscription;
@@ -22,57 +21,68 @@ export async function handleSubscriptionEvent(
     });
   }
 
-  const subscriptionData: any = {
+  const subscriptionData = {
     subscription_id: subscription.id,
-    stripe_user_id: subscription.customer,
-    status: subscription.status,
+    stripe_user_id: subscription.customer as string,
+    status: type === "deleted" ? "cancelled" : subscription.status,
     start_date: new Date(subscription.created * 1000).toISOString(),
     plan_id: subscription.items.data[0]?.price.id,
     user_id: subscription.metadata?.userId || "",
     email: customerEmail,
   };
 
-  let data, error;
-  if (type === "deleted") {
-    ({ data, error } = await supabase
-      .from("subscriptions")
-      .update({ status: "cancelled", email: customerEmail })
-      .match({ subscription_id: subscription.id })
-      .select());
-    if (!error) {
-      const { error: userError } = await supabase
-        .from("user")
-        .update({ subscription: null })
-        .eq("email", customerEmail);
-      if (userError) {
-        console.error("Error updating user subscription status:", userError);
-        return NextResponse.json({
-          status: 500,
-          error: "Error updating user subscription status",
-        });
-      }
-    }
-  } else {
-    ({ data, error } = await supabase
-      .from("subscriptions")
-      [type === "created" ? "insert" : "update"](
-        type === "created" ? [subscriptionData] : subscriptionData
-      )
-      .match({ subscription_id: subscription.id })
-      .select());
-  }
+  try {
+    let data;
+    if (type === "deleted") {
+      // Update subscription status to cancelled
+      data = await prisma.subscriptions.update({
+        where: {
+          subscription_id: subscription.id,
+        },
+        data: {
+          status: "cancelled",
+          email: customerEmail,
+        },
+      });
 
-  if (error) {
-    console.error(`Error during subscription ${type}:`, error);
+      // Update user subscription to null
+      await prisma.user.update({
+        where: {
+          email: customerEmail,
+        },
+        data: {
+          subscription: null,
+        },
+      });
+    } else if (type === "created") {
+      // Create new subscription
+      data = await prisma.subscriptions.create({
+        data: subscriptionData,
+      });
+    } else {
+      // Update existing subscription
+      data = await prisma.subscriptions.update({
+        where: {
+          subscription_id: subscription.id,
+        },
+        data: subscriptionData,
+      });
+    }
+
+    return NextResponse.json({
+      status: 200,
+      message: `Subscription ${type} success`,
+      data,
+    });
+  } catch (error: any) {
+    console.error(`Error during subscription ${type}:`, {
+      message: error.message,
+      code: error.code,
+    });
+
     return NextResponse.json({
       status: 500,
-      error: `Error during subscription ${type}`,
+      error: `Error during subscription ${type}: ${error.message}`,
     });
   }
-
-  return NextResponse.json({
-    status: 200,
-    message: `Subscription ${type} success`,
-    data,
-  });
 }

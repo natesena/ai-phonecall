@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
 export async function POST(request: NextRequest) {
@@ -18,34 +19,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch calls from VAPI
-    const response = await fetch("https://api.vapi.ai/call", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.VAPI_API_KEY}`,
-        "Content-Type": "application/json",
+    // Ensure we're getting an array of calls
+    const calls = await prisma.call.findMany({
+      where: {
+        customerPhone: phoneNumber,
+        userId: userId,
+      },
+      orderBy: {
+        startedAt: "desc",
+      },
+      select: {
+        id: true,
+        callId: true,
+        status: true,
+        startedAt: true,
+        endedAt: true,
+        durationSeconds: true,
+        cost: true,
+        customerPhone: true,
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`VAPI responded with status: ${response.status}`);
-    }
-
-    const vapiData = await response.json();
-
     // Ensure we always return an array, even if empty
     return NextResponse.json({
-      calls: Array.isArray(vapiData) ? vapiData : [],
+      calls: Array.isArray(calls) ? calls : [],
     });
   } catch (error) {
-    console.error("VAPI API Error:", {
+    console.error("API Error:", {
       error,
-      path: "/api/vapi/calls",
+      path: "/api/calls/",
       phoneNumber: request.body,
     });
 
     return NextResponse.json(
-      { error: "Failed to fetch calls from VAPI" },
+      { error: "Failed to fetch calls" },
       { status: 500 }
     );
   }
