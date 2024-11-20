@@ -6,6 +6,7 @@ import config from "@/config";
 import SnowScene from "@/components/homepage/three/snowScene";
 import AudioPlayer from "@/components/homepage/audio-player";
 import HowTo from "@/components/homepage/howto/howto";
+import ReviewCarousel from "@/components/homepage/reviews/reviewCarousel";
 import prisma from "@/lib/prisma";
 import { formatNumber } from "@/lib/utils";
 
@@ -45,9 +46,7 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
-              <p className="text-center text-5xl text-white">
-                Reviews, reviews, reviews
-              </p>
+              <ReviewCarousel />
             </div>
           </div>
         </div>
