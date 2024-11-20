@@ -6,15 +6,16 @@ import { createNoise2D } from "simplex-noise";
 
 export default function SnowScene() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<{
+    scene: THREE.Scene;
+    camera: THREE.PerspectiveCamera;
+    renderer: THREE.WebGLRenderer;
+    particles: THREE.Points;
+    planeMesh: THREE.Mesh;
+  }>();
 
   useEffect(() => {
     if (!containerRef.current) return;
-
-    let scene: THREE.Scene,
-      camera: THREE.PerspectiveCamera,
-      renderer: THREE.WebGLRenderer,
-      particles: THREE.Points,
-      planeMesh: THREE.Mesh;
 
     const noise = createNoise2D();
     const particleNum = 10000;
@@ -126,7 +127,7 @@ export default function SnowScene() {
 
     const init = () => {
       // Scene setup
-      scene = new THREE.Scene();
+      const scene = new THREE.Scene();
       scene.fog = new THREE.Fog(0x000036, 0, minRange * 2);
 
       // Get container dimensions
@@ -134,17 +135,17 @@ export default function SnowScene() {
       const height = containerRef.current?.clientHeight || window.innerHeight;
 
       // Camera setup
-      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
+      const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
       camera.position.set(0, -100, 400);
       camera.lookAt(scene.position);
 
       // Renderer setup
-      renderer = new THREE.WebGLRenderer({
+      const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
       });
       renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setClearColor(0x000000, 0); // Transparent background
+      renderer.setClearColor(0x000000, 0);
       renderer.setSize(width, height);
       renderer.shadowMap.enabled = true;
 
@@ -166,7 +167,7 @@ export default function SnowScene() {
         shininess: 50,
         specular: 0x444444,
       });
-      planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+      const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
       planeMesh.receiveShadow = true;
       planeMesh.rotation.x = -0.5 * Math.PI;
       planeMesh.position.set(0, -100, 0);
@@ -213,15 +214,28 @@ export default function SnowScene() {
         sizeAttenuation: true,
       });
 
-      particles = new THREE.Points(pointGeometry, pointMaterial);
+      const particles = new THREE.Points(pointGeometry, pointMaterial);
       (particles.geometry as any).velocities = velocities;
       scene.add(particles);
+
+      // Store references for resize handling
+      sceneRef.current = {
+        scene,
+        camera,
+        renderer,
+        particles,
+        planeMesh,
+      };
 
       // Add to container
       containerRef.current?.appendChild(renderer.domElement);
     };
 
     const render = (timeStamp: number) => {
+      if (!sceneRef.current) return;
+      const { scene, camera, renderer, particles, planeMesh } =
+        sceneRef.current;
+
       makeRoughGround(planeMesh);
 
       const positions = particles.geometry.attributes.position;
@@ -250,30 +264,48 @@ export default function SnowScene() {
       requestAnimationFrame(render);
     };
 
-    const onResize = () => {
-      if (!containerRef.current) return;
+    const handleResize = () => {
+      if (!containerRef.current || !sceneRef.current) return;
 
+      const { camera, renderer } = sceneRef.current;
       const width = containerRef.current.clientWidth;
       const height = containerRef.current.clientHeight;
 
-      renderer.setPixelRatio(window.devicePixelRatio);
+      // Update renderer
       renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for performance
+
+      // Update camera
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     };
 
     // Initialize scene
     init();
-    requestAnimationFrame(render);
 
-    // Handle resizing
-    window.addEventListener("resize", onResize);
+    // Start animation
+    let animationFrameId = requestAnimationFrame(render);
+
+    // Add resize listener
+    window.addEventListener("resize", handleResize);
+
+    // Add resize observer for container size changes
+    const resizeObserver = new ResizeObserver(handleResize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
 
     // Cleanup
     return () => {
-      window.removeEventListener("resize", onResize);
-      containerRef.current?.removeChild(renderer.domElement);
-      renderer.dispose();
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
+      cancelAnimationFrame(animationFrameId);
+
+      if (sceneRef.current) {
+        const { renderer } = sceneRef.current;
+        containerRef.current?.removeChild(renderer.domElement);
+        renderer.dispose();
+      }
     };
   }, []);
 

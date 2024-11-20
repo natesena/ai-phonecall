@@ -8,6 +8,7 @@ import { Loading } from "@/components/loading";
 import ErrorPage from "@/components/errorpage/ErrorPage";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
+import { Call } from "@prisma/client";
 
 interface Transaction {
   stripe_id: string;
@@ -20,6 +21,10 @@ interface TimelineItem {
   type: "call" | "transaction";
   date: string;
   data: any;
+}
+
+interface CallsResponse {
+  calls: Call[];
 }
 
 export default function OverviewPage() {
@@ -49,29 +54,35 @@ export default function OverviewPage() {
           fetch("/api/payments/query"),
         ]);
 
-        const calls = await callsResponse.json();
+        const callsData = await callsResponse.json();
         const transactions = await transactionsResponse.json();
 
-        console.log(calls);
-        console.log(transactions);
+        // Initialize empty arrays for both item types
+        let callItems: TimelineItem[] = [];
+        let transactionItems: TimelineItem[] = [];
 
-        // Safely handle calls response
-        const callItems: TimelineItem[] = Array.isArray(calls)
-          ? calls.map((call: any) => ({
-              type: "call",
-              date: call.startedAt,
-              data: call,
-            }))
-          : [];
+        // Only map calls if they exist
+        if (callsData?.calls && callsData.calls.length > 0) {
+          callItems = callsData.calls.map((call: Call) => ({
+            type: "call",
+            date: call.startedAt,
+            data: call,
+          }));
+        }
 
-        // Safely handle transactions response
-        const transactionItems: TimelineItem[] = transactions?.transactions
-          ? transactions.transactions.map((transaction: Transaction) => ({
+        // Only map transactions if they exist
+        if (
+          transactions?.transactions &&
+          transactions.transactions.length > 0
+        ) {
+          transactionItems = transactions.transactions.map(
+            (transaction: Transaction) => ({
               type: "transaction",
               date: transaction.payment_time,
               data: transaction,
-            }))
-          : [];
+            })
+          );
+        }
 
         // Combine and sort all items by date
         const allItems = [...callItems, ...transactionItems].sort(

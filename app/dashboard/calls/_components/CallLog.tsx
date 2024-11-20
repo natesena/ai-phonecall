@@ -62,7 +62,6 @@ export default function CallLog({ call }: CallLogProps) {
   const hasArtifacts = Boolean(fullCall.artifact);
   const hasRecording = Boolean(fullCall.artifact?.stereoRecordingUrl);
   const hasTranscript = Boolean(fullCall.artifact?.transcript);
-  console.log(fullCall);
   const duration =
     durationInSeconds > 0
       ? `${Math.floor(durationInSeconds / 60)}:${(durationInSeconds % 60)
