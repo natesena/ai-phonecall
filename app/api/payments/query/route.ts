@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
@@ -19,38 +18,16 @@ export async function GET(request: Request) {
       );
     }
 
-    // First get the stripe_customer_id from the user record
-    const cookieStore = await cookies();
+    const userData = await prisma.user.findUnique({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        stripe_customer_id: true,
+      },
+    });
 
-    const supabase = createServerClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-          set(
-            name: string,
-            value: string,
-            options: { path?: string; maxAge?: number }
-          ) {
-            cookieStore.set(name, value, options);
-          },
-          remove(name: string, options: { path?: string }) {
-            cookieStore.set(name, "", options);
-          },
-        },
-      }
-    );
-
-    const { data: userData, error: userError } = await supabase
-      .from("user")
-      .select("stripe_customer_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (userError || !userData?.stripe_customer_id) {
+    if (!userData?.stripe_customer_id) {
       return NextResponse.json(
         { error: "No customer ID found for user" },
         { status: 404 }

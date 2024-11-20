@@ -1,12 +1,11 @@
 import Stripe from "stripe";
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import { updateUserCredits } from "./updateCredit";
 import { PRICE_TO_CREDITS } from "@/app/config/stripe";
+import prisma from "@/lib/prisma";
 
 export async function handleCheckoutSessionCompleted(
   event: Stripe.Event,
-  supabase: ReturnType<typeof createServerClient>,
   stripe: Stripe
 ) {
   const session = await stripe.checkout.sessions.retrieve(
@@ -20,13 +19,13 @@ export async function handleCheckoutSessionCompleted(
 
   // Add stripe_customer_id to user at the start, regardless of payment type
   if (session.customer && metadata?.userId) {
-    const { error: customerIdError } = await supabase
-      .from("user")
-      .update({ stripe_customer_id: session.customer as string })
-      .eq("user_id", metadata.userId);
-
-    if (customerIdError) {
-      console.error("Error updating stripe_customer_id:", customerIdError);
+    try {
+      await prisma.user.update({
+        where: { user_id: metadata.userId },
+        data: { stripe_customer_id: session.customer as string },
+      });
+    } catch (error) {
+      console.error("Error updating stripe_customer_id:", error);
       // Continue with the rest of the logic even if this update fails
     }
   }
@@ -37,17 +36,11 @@ export async function handleCheckoutSessionCompleted(
     try {
       await stripe.subscriptions.update(subscriptionId as string, { metadata });
 
-      const { error: invoiceError } = await supabase
-        .from("invoices")
-        .update({ user_id: metadata?.userId })
-        .eq("email", metadata?.email);
-      if (invoiceError) throw new Error("Error updating invoice");
-
-      const { error: userError } = await supabase
-        .from("user")
-        .update({ subscription: session.id })
-        .eq("user_id", metadata?.userId);
-      if (userError) throw new Error("Error updating user subscription");
+      // Update user subscription
+      await prisma.user.update({
+        where: { user_id: metadata?.userId },
+        data: { subscription: session.id },
+      });
 
       return NextResponse.json({
         status: 200,
@@ -64,19 +57,19 @@ export async function handleCheckoutSessionCompleted(
     // One-time payment logic
     const dateTime = new Date(session.created * 1000).toISOString();
     try {
-      const { data: user, error: userError } = await supabase
-        .from("user")
-        .select("*")
-        .eq("user_id", metadata?.userId);
-      if (userError) throw new Error("Error fetching user");
+      const user = await prisma.user.findUnique({
+        where: { user_id: metadata?.userId },
+      });
+
+      if (!user) throw new Error("User not found");
 
       const paymentData = {
         user_id: metadata?.userId,
         stripe_id: session.id,
         email: metadata?.email,
-        amount: session.amount_total! / 100,
+        amount: (session.amount_total! / 100).toString(), // Convert to string as per schema
         customer_details: JSON.stringify(session.customer_details),
-        payment_intent: session.payment_intent,
+        payment_intent: session.payment_intent as string,
         payment_time: dateTime,
         payment_date: new Date(session.created * 1000)
           .toISOString()
@@ -84,19 +77,9 @@ export async function handleCheckoutSessionCompleted(
         currency: session.currency,
       };
 
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from("payments")
-        .insert([paymentData]);
-
-      if (paymentsError) {
-        console.error("Payment insertion error details:", {
-          error: paymentsError,
-          errorMessage: paymentsError.message,
-          errorDetails: paymentsError.details,
-          paymentData,
-        });
-        throw new Error(`Error inserting payment: ${paymentsError.message}`);
-      }
+      await prisma.payments.create({
+        data: paymentData,
+      });
 
       const priceId = session.line_items?.data[0]?.price?.id;
       const stripeProductId = (
@@ -112,11 +95,24 @@ export async function handleCheckoutSessionCompleted(
       }
 
       try {
-        await updateUserCredits(supabase, {
-          userId: metadata?.userId,
-          stripeProductId,
-          productName,
-          amount: PRICE_TO_CREDITS[priceId] || 0,
+        await prisma.user_credits.upsert({
+          where: {
+            user_id_stripe_product_id: {
+              user_id: metadata?.userId,
+              stripe_product_id: stripeProductId,
+            },
+          },
+          update: {
+            amount: {
+              increment: PRICE_TO_CREDITS[priceId] || 0,
+            },
+          },
+          create: {
+            user_id: metadata?.userId,
+            stripe_product_id: stripeProductId,
+            product_name: productName,
+            amount: PRICE_TO_CREDITS[priceId] || 0,
+          },
         });
       } catch (error) {
         console.error("Error in handleCheckoutSessionCompleted:", error);

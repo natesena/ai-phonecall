@@ -81,3 +81,23 @@ model user_credits {
 
   @@unique([user_id, stripe_product_id])
 }
+
+model Call {
+  id              String    @id @default(uuid())
+  callId          String    @unique @map("call_id")    // from webhook message.call.id
+  userId          String?   @map("user_id")            // to be linked with clerk user_id
+  customerPhone   String    @map("customer_phone")     // from webhook message.customer.number
+  assistantId     String    @map("assistant_id")       // from webhook message.assistant.id
+  status          String                               // in-progress, ended, etc
+  startedAt       DateTime? @map("started_at")
+  endedAt         DateTime? @map("ended_at")
+  durationSeconds Int?      @map("duration_seconds")
+  endedReason     String?   @map("ended_reason")       // customer-ended-call, etc
+  cost            Decimal?  @db.Decimal(10, 4)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([customerPhone])
+  @@map("calls")
+}

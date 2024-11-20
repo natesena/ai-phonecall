@@ -1,35 +1,20 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { handleSubscriptionEvent } from "./handleSubscriptionEvent";
 import { handleInvoiceEvent } from "./handleInvoiceEvent";
 import { handleCheckoutSessionCompleted } from "./handleCheckoutSessionCompleted";
+import prisma from "@/lib/prisma";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // At the top of your file, define the credit mapping
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-
-  const supabase: any = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
   const reqText = await req.text();
-  return webhooksHandler(reqText, req, supabase);
+  return webhooksHandler(reqText, req);
 }
 
 async function webhooksHandler(
   reqText: string,
-  request: NextRequest,
-  supabase: ReturnType<typeof createServerClient>
+  request: NextRequest
 ): Promise<NextResponse> {
   const sig = request.headers.get("Stripe-Signature");
 
@@ -42,17 +27,17 @@ async function webhooksHandler(
 
     switch (event.type) {
       case "customer.subscription.created":
-        return handleSubscriptionEvent(event, "created", supabase, stripe);
+        return handleSubscriptionEvent(event, "created", stripe);
       case "customer.subscription.updated":
-        return handleSubscriptionEvent(event, "updated", supabase, stripe);
+        return handleSubscriptionEvent(event, "updated", stripe);
       case "customer.subscription.deleted":
-        return handleSubscriptionEvent(event, "deleted", supabase, stripe);
+        return handleSubscriptionEvent(event, "deleted", stripe);
       case "invoice.payment_succeeded":
-        return handleInvoiceEvent(event, "succeeded", supabase, stripe);
+        return handleInvoiceEvent(event, "succeeded", stripe);
       case "invoice.payment_failed":
-        return handleInvoiceEvent(event, "failed", supabase, stripe);
+        return handleInvoiceEvent(event, "failed", stripe);
       case "checkout.session.completed":
-        return handleCheckoutSessionCompleted(event, supabase, stripe);
+        return handleCheckoutSessionCompleted(event, stripe);
       default:
         return NextResponse.json({
           status: 400,

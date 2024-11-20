@@ -1,41 +1,24 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
+  const { userId } = await auth();
 
   if (!userId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const cookieStore = cookies();
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        async get(name: string) {
-          return (await cookieStore).get(name)?.value;
-        },
-      },
-    }
-  );
-
   try {
-    const { data: credits, error } = await supabase
-      .from("user_credits")
-      .select("product_name, amount")
-      .eq("user_id", userId);
-
-    if (error) {
-      console.error("Error fetching user credits:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch user credits" },
-        { status: 500 }
-      );
-    }
+    const credits = await prisma.user_credits.findMany({
+      where: {
+        user_id: userId,
+      },
+      select: {
+        product_name: true,
+        amount: true,
+      },
+    });
 
     return NextResponse.json({ credits });
   } catch (error) {

@@ -24,6 +24,16 @@ export default function Home() {
             <div className="pricing-section-container flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
               <Pricing />
             </div>
+            <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
+              <p className="lobster-regular text-center text-5xl text-white">
+                1,000,000 calls and counting!
+              </p>
+            </div>
+            <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
+              <p className="text-center text-5xl text-white">
+                Reviews, reviews, reviews
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col justify-center items-center w-full p-3">
