@@ -2,12 +2,14 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { getCustomerEmail } from "./getCustomerEmail";
 import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 export async function handleSubscriptionEvent(
   event: Stripe.Event,
   type: "created" | "updated" | "deleted",
   stripe: Stripe
 ) {
+  const { userId } = await auth();
   const subscription = event.data.object as Stripe.Subscription;
   const customerEmail = await getCustomerEmail(
     subscription.customer as string,
@@ -34,24 +36,29 @@ export async function handleSubscriptionEvent(
   try {
     let data;
     if (type === "deleted") {
-      // Update subscription status to cancelled
-      data = await prisma.subscriptions.update({
+      // First find the subscription
+      const subscription_record = await prisma.subscriptions.findFirst({
         where: {
           subscription_id: subscription.id,
+          user_id: userId || "",
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!subscription_record) {
+        throw new Error("Subscription not found");
+      }
+
+      // Then update using the primary key
+      data = await prisma.subscriptions.update({
+        where: {
+          id: subscription_record.id,
         },
         data: {
           status: "cancelled",
           email: customerEmail,
-        },
-      });
-
-      // Update user subscription to null
-      await prisma.user.update({
-        where: {
-          email: customerEmail,
-        },
-        data: {
-          subscription: null,
         },
       });
     } else if (type === "created") {
@@ -61,9 +68,25 @@ export async function handleSubscriptionEvent(
       });
     } else {
       // Update existing subscription
-      data = await prisma.subscriptions.update({
+
+      const subscription_record = await prisma.subscriptions.findFirst({
         where: {
           subscription_id: subscription.id,
+          user_id: userId || "",
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (!subscription_record) {
+        throw new Error("Subscription not found");
+      }
+
+      // Then update using the primary key
+      data = await prisma.subscriptions.update({
+        where: {
+          id: subscription_record.id,
         },
         data: subscriptionData,
       });

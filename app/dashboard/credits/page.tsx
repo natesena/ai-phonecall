@@ -16,7 +16,7 @@ export default function CreditsPage() {
   useEffect(() => {
     async function fetchCredits() {
       try {
-        const response = await fetch(`/api/credits?userId=${userId}`);
+        const response = await fetch(`/api/credits`);
         if (!response.ok) throw new Error("Failed to fetch credits");
         const data = await response.json();
         setCredits(data.credits);

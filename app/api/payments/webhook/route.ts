@@ -3,7 +3,6 @@ import Stripe from "stripe";
 import { handleSubscriptionEvent } from "./handleSubscriptionEvent";
 import { handleInvoiceEvent } from "./handleInvoiceEvent";
 import { handleCheckoutSessionCompleted } from "./handleCheckoutSessionCompleted";
-import prisma from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -24,6 +23,8 @@ async function webhooksHandler(
       sig!,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
+
+    console.log("Event type:", event.type);
 
     switch (event.type) {
       case "customer.subscription.created":

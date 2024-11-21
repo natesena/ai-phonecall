@@ -46,6 +46,8 @@ model subscriptions {
   default_payment_method_id String?
   email                     String
   user_id                   String
+
+  @@unique([subscription_id, user_id])
 }
 
 model subscriptions_plans {

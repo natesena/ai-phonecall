@@ -3,17 +3,17 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();
+
     if (!userId) {
       console.log("No user ID found");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get ID from route params instead of search params
-    const callId = params.id;
+    const callId = (await params).id;
     if (!callId) {
       return NextResponse.json(
         { error: "Call ID is required" },
@@ -43,7 +43,7 @@ export async function GET(
   } catch (error) {
     console.error("VAPI API Error:", {
       error,
-      path: `/api/vapi/call/${params.id}`,
+      path: `/api/vapi/call/${(await params).id}`,
     });
 
     return NextResponse.json(

@@ -37,10 +37,7 @@ export async function handleCheckoutSessionCompleted(
       await stripe.subscriptions.update(subscriptionId as string, { metadata });
 
       // Update user subscription
-      await prisma.user.update({
-        where: { user_id: metadata?.userId },
-        data: { subscription: session.id },
-      });
+      // (removed)
 
       return NextResponse.json({
         status: 200,
@@ -55,6 +52,7 @@ export async function handleCheckoutSessionCompleted(
     }
   } else {
     // One-time payment logic
+    console.log("One-time payment logic");
     const dateTime = new Date(session.created * 1000).toISOString();
     try {
       const user = await prisma.user.findUnique({
@@ -74,12 +72,13 @@ export async function handleCheckoutSessionCompleted(
         payment_date: new Date(session.created * 1000)
           .toISOString()
           .split("T")[0],
-        currency: session.currency,
+        currency: session.currency || "",
       };
 
       await prisma.payments.create({
         data: paymentData,
       });
+      console.log("Payment created");
 
       const priceId = session.line_items?.data[0]?.price?.id;
       const stripeProductId = (
@@ -93,7 +92,7 @@ export async function handleCheckoutSessionCompleted(
         console.error("Missing product details in session:", session);
         throw new Error("Missing product details in session");
       }
-
+      console.log("About to try credits upsert");
       try {
         await prisma.user_credits.upsert({
           where: {

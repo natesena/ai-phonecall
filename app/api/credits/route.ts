@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const credits = await prisma.user_credits.findMany({
+    const credits = await prisma.user_credits.findFirst({
       where: {
         user_id: userId,
       },
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ credits });
+    return NextResponse.json({ credits: credits ? [credits] : [] });
   } catch (error) {
     console.error("Error in credits route:", error);
     return NextResponse.json(

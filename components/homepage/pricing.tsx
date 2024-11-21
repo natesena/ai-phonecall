@@ -12,7 +12,6 @@ import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -116,22 +115,27 @@ export default function Pricing() {
 
   const handleCheckout = async (price: number, priceId: string) => {
     try {
-      const { data } = await axios.post(
-        `/api/payments/create-checkout-session`,
-        {
+      const response = await fetch(`/api/payments/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           userId: user?.id,
           email: user?.emailAddresses?.[0]?.emailAddress,
           price,
           priceId,
-        }
-      );
+        }),
+      });
+
+      const data = await response.json();
 
       if (data.sessionId) {
         const stripe = await stripePromise;
-        const response = await stripe?.redirectToCheckout({
+        const result = await stripe?.redirectToCheckout({
           sessionId: data.sessionId,
         });
-        return response;
+        return result;
       } else {
         console.error("Failed to create checkout session");
         toast("Failed to create checkout session");
