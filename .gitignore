@@ -33,6 +33,7 @@ yarn-error.log*
 
 webhooks/
 webhooks/*
+webhooks/*.json
 
 # typescript
 *.tsbuildinfo
