@@ -21,10 +21,10 @@ const reviews = [
       "Santa's call made my children's Christmas magical! The personalized experience was incredible.",
   },
   {
-    decoration: "🎁",
+    decoration: "🎄",
     reviewerName: "Michael Chen",
     reviewerImage: "/reviews/michael.jpg",
-    rating: "🎁 🎁 🎁 🎁 🎁",
+    rating: "⭐ ⭐ ⭐ ⭐ ⭐",
     reviewText:
       "Worth every penny! My kids were absolutely thrilled to talk to Santa directly.",
   },
@@ -32,7 +32,7 @@ const reviews = [
     decoration: "🎁",
     reviewerName: "Emma Williams",
     reviewerImage: "/reviews/emma.jpg",
-    rating: "🎁 🎁 🎁 🎁 🎁",
+    rating: "🍪 🥛 🍪 🥛 🍪",
     reviewText:
       "Such a wonderful Christmas tradition. Will definitely do this again next year!",
   },
