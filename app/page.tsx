@@ -7,6 +7,7 @@ import SnowScene from "@/components/homepage/three/snowScene";
 import AudioPlayer from "@/components/homepage/audio-player";
 import HowTo from "@/components/homepage/howto/howto";
 import ReviewCarousel from "@/components/homepage/reviews/reviewCarousel";
+import Sleigh from "@/components/homepage/decoration/sleigh";
 import prisma from "@/lib/prisma";
 import { formatNumber } from "@/lib/utils";
 
@@ -34,14 +35,19 @@ export default async function Home() {
             <SnowScene />
           </div>
           <div className="home-page-section relative z-10 min-h-[calc(100vh-var(--navbar-height))]">
-            <div className="hero-section-container flex flex-col justify-center items-center w-full p-3">
-              <HeroSection />
+            <div className="min-h-[calc(100svh-var(--navbar-height))] sm:min-h-0">
+              <div className="hero-section-container flex flex-col justify-center items-center w-full p-3">
+                <HeroSection />
+              </div>
+              <div className="pricing-section-container flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
+                <Pricing />
+              </div>
             </div>
-            <div className="pricing-section-container flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
-              <Pricing />
-            </div>
-            <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
-              <p className="lobster-regular text-center text-5xl text-white">
+            <div className="flex flex-col justify-center items-center w-full my-[1rem] sm:my-[7rem] px-4 mb-16 relative">
+              <div className="absolute transform -translate-x-[25%] translate-y-[50%] sleigh-diagonal">
+                <Sleigh />
+              </div>
+              <p className="lobster-regular text-center text-5xl text-white mx-auto relative z-10">
                 {formatNumber(count)} calls and counting!
               </p>
             </div>
@@ -50,7 +56,7 @@ export default async function Home() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center w-full p-3">
+        <div className="flex flex-col justify-center items-center w-full p-3 my-[5rem] sm:my-[7rem]">
           <HowTo />
         </div>
         <div className="relative bg-[#840000] faq-section flex justify-center items-center w-full">

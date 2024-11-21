@@ -152,7 +152,7 @@ export default function Pricing() {
     {
       title: "Call Santa",
       price: 5,
-      description: "Essential features you need to get started",
+      description: "Speak with jolly old St.Nick himself",
       features: [
         "1x 5 minute call with Santa",
         "No milk & cookies necessary",

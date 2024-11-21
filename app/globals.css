@@ -238,3 +238,16 @@ main {
 .audio-ready {
   overflow: auto !important;
 }
+
+@keyframes sleigh-diagonal {
+  0% {
+    transform: translate(-125%, 50%);
+  }
+  100% {
+    transform: translate(125%, -50%);
+  }
+}
+
+.sleigh-diagonal {
+  animation: sleigh-diagonal 10s linear infinite;
+}

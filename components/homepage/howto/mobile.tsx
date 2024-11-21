@@ -35,12 +35,12 @@ export function MobileHowTo({ steps }: MobileHowToProps) {
           <ChevronLeft className="h-6 w-6" />
         </Button>
 
-        <div className="text-center px-12">
+        <div className="text-center max-w-[70vw] h-[170px] bg-white p-4 rounded-lg dark:text-black">
           <div className="text-4xl mb-4">{steps[currentStep].icon}</div>
           <h3 className="text-xl font-semibold mb-2">
             {steps[currentStep].title}
           </h3>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-black">
             {steps[currentStep].description}
           </p>
         </div>
