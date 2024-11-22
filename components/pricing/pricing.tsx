@@ -1,111 +1,27 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { Band } from "@/components/homepage/band";
-
-type PricingCardProps = {
-  user: any;
-  handleCheckout: any;
-  price: number;
-  title: string;
-  description: string;
-  features: string[];
-  actionLabel: string;
-  priceId: string;
-};
-
-const PricingCard = ({
-  user,
-  handleCheckout,
-  price,
-  title,
-  description,
-  features,
-  actionLabel,
-  priceId,
-}: PricingCardProps) => {
-  const router = useRouter();
-  return (
-    <div className="relative">
-      <div className="shiny-border rounded-lg p-[20px]">
-        <Card className="pricing w-72 flex flex-col justify-between py-1 mx-auto sm:mx-0 bg-white dark:bg-zinc-900">
-          <div>
-            <CardHeader className="pb-8 pt-4">
-              <CardTitle className="text-zinc-700 dark:text-zinc-300 text-lg">
-                {title}
-              </CardTitle>
-
-              <div className="flex gap-0.5">${price}</div>
-              <CardDescription className="pt-1.5 h-12">
-                {description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              {features.map((feature: string) => (
-                <CheckItem key={feature} text={feature} />
-              ))}
-            </CardContent>
-          </div>
-          <CardFooter className="mt-2">
-            <Button
-              onClick={() => {
-                if (user?.id) {
-                  handleCheckout(price, priceId);
-                } else {
-                  toast("Please login or sign up to purchase", {
-                    description: "You must be logged in to make a purchase",
-                    action: {
-                      label: "Sign Up",
-                      onClick: () => {
-                        router.push("/sign-up");
-                      },
-                    },
-                  });
-                }
-              }}
-              className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
-              type="button"
-            >
-              <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur" />
-              {actionLabel}
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-const CheckItem = ({ text }: { text: string }) => (
-  <div className="flex gap-2">
-    <CheckCircle2 size={18} className="my-auto text-green-400" />
-    <p className="pt-0.5 text-zinc-700 dark:text-zinc-300 text-sm">{text}</p>
-  </div>
-);
+import PricingCard from "./pricing-card";
+import { ConsentModal } from "@/components/consent/consent-modal";
 
 export default function Pricing() {
   const { user } = useUser();
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [pendingCheckout, setPendingCheckout] = useState<{
+    price: number;
+    priceId: string;
+  } | null>(null);
 
   useEffect(() => {
     setStripePromise(loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!));
   }, []);
 
-  const handleCheckout = async (price: number, priceId: string) => {
+  const proceedToCheckout = async (price: number, priceId: string) => {
     try {
       const response = await fetch(`/api/payments/create-checkout-session`, {
         method: "POST",
@@ -130,14 +46,19 @@ export default function Pricing() {
         return result;
       } else {
         console.error("Failed to create checkout session");
-        toast("Failed to create checkout session");
+        toast.error("Failed to create checkout session");
         return;
       }
     } catch (error) {
       console.error("Error during checkout:", error);
-      toast("Error during checkout");
+      toast.error("Error during checkout");
       return;
     }
+  };
+
+  const handleCheckout = async (price: number, priceId: string) => {
+    setPendingCheckout({ price, priceId });
+    setShowConsentModal(true);
   };
 
   const plans = [
@@ -175,6 +96,20 @@ export default function Pricing() {
           );
         })}
       </section>
+
+      <ConsentModal
+        isOpen={showConsentModal}
+        onClose={() => {
+          setShowConsentModal(false);
+          setPendingCheckout(null);
+        }}
+        onConsent={() => {
+          setShowConsentModal(false);
+          if (pendingCheckout) {
+            proceedToCheckout(pendingCheckout.price, pendingCheckout.priceId);
+          }
+        }}
+      />
     </div>
   );
 }

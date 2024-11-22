@@ -251,3 +251,20 @@ main {
 .sleigh-diagonal {
   animation: sleigh-diagonal 10s linear infinite;
 }
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-fall {
+  animation: fall 10s linear infinite;
+}
+
+.animate-fall-slow {
+  animation: fall 13s linear infinite;
+}

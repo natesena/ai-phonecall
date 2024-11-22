@@ -116,6 +116,6 @@ model consent_record {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
+  @@unique([user_id, type, version])
   @@index([user_id])
-  @@index([user_id, type, version])
 }
