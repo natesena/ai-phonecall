@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { Band } from "@/components/homepage/band";
 import PricingCard from "./pricing-card";
 import { ConsentModal } from "@/components/consent/consent-modal";
+import { privacyv0 } from "@/app/privacy/_versions/v0_privacy";
+import { termsv0 } from "@/app/terms/_versions/v0_terms";
 
 export default function Pricing() {
   const { user } = useUser();
@@ -20,6 +22,28 @@ export default function Pricing() {
   useEffect(() => {
     setStripePromise(loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!));
   }, []);
+
+  const checkExistingConsent = async () => {
+    try {
+      const [termsResponse, privacyResponse] = await Promise.all([
+        fetch(`/api/consent?type=terms&version=${termsv0.version}`),
+        fetch(`/api/consent?type=privacy&version=${privacyv0.version}`),
+      ]);
+
+      const [termsData, privacyData] = await Promise.all([
+        termsResponse.json(),
+        privacyResponse.json(),
+      ]);
+
+      return {
+        hasTermsConsent: !!termsData.consent,
+        hasPrivacyConsent: !!privacyData.consent,
+      };
+    } catch (error) {
+      console.error("Error checking consent:", error);
+      return { hasTermsConsent: false, hasPrivacyConsent: false };
+    }
+  };
 
   const proceedToCheckout = async (price: number, priceId: string) => {
     try {
@@ -57,8 +81,16 @@ export default function Pricing() {
   };
 
   const handleCheckout = async (price: number, priceId: string) => {
-    setPendingCheckout({ price, priceId });
-    setShowConsentModal(true);
+    const { hasTermsConsent, hasPrivacyConsent } = await checkExistingConsent();
+
+    if (hasTermsConsent && hasPrivacyConsent) {
+      // If user has already consented, proceed directly to checkout
+      proceedToCheckout(price, priceId);
+    } else {
+      // If user hasn't consented, show the modal
+      setPendingCheckout({ price, priceId });
+      setShowConsentModal(true);
+    }
   };
 
   const plans = [

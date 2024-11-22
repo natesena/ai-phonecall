@@ -51,12 +51,30 @@ export async function GET(request: NextRequest) {
 
   const searchParams = request.nextUrl.searchParams;
   const version = searchParams.get("version");
+  const type = searchParams.get("type");
+
+  // Validate parameters
+  if (!version || !type) {
+    return NextResponse.json(
+      { error: "Version and type are required" },
+      { status: 400 }
+    );
+  }
+
+  // Validate type
+  if (type !== "terms" && type !== "privacy") {
+    return NextResponse.json(
+      { error: "Type must be either 'terms' or 'privacy'" },
+      { status: 400 }
+    );
+  }
 
   try {
     const consent = await prisma.consent_record.findFirst({
       where: {
         user_id: userId,
-        terms_version: version,
+        type: type,
+        version: version,
       },
       orderBy: {
         timestamp: "desc",
