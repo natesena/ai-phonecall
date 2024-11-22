@@ -29,9 +29,10 @@ export default function LegalPage({ currentVersion, type }: LegalPageProps) {
   async function checkConsentStatus() {
     try {
       const response = await fetch(
-        `/api/consent/check?version=${currentVersion.version}&type=${type}`
+        `/api/consent?version=${currentVersion.version}&type=${type}`
       );
       const data = await response.json();
+      console.log(data);
       if (data.consent) {
         setLocalConsent(true);
       }
