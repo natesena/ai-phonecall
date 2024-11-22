@@ -1,11 +1,11 @@
-import { Call } from "@prisma/client";
+import type { call } from ".prisma/client";
 import { Phone, ChevronDown, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, use } from "react";
 import WaveformPlayer from "./WaveformPlayer";
 
 // Extend the Prisma Call type with VAPI-specific fields
-interface CallWithArtifacts extends Call {
+interface CallWithArtifacts extends call {
   artifact?: {
     recordingUrl: string;
     stereoRecordingUrl: string;
@@ -85,7 +85,7 @@ export default function CallLog({ call }: CallLogProps) {
           <span className="text-sm text-gray-500">
             {fullCall.customer?.number || fullCall.customerPhone}
           </span>
-          <span className="font-medium">
+          <span className="font-medium dark:text-black">
             Duration: {formatDuration(durationInSeconds)}
           </span>
           <span className="text-sm text-gray-500">({duration})</span>

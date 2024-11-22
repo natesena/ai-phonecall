@@ -65,7 +65,7 @@ export default function TransactionsPage() {
           <TableBody>
             {transactions?.map((transaction: Transaction) => (
               <TableRow key={transaction.stripe_id}>
-                <TableCell>
+                <TableCell className="dark:text-black">
                   {formatDistance(
                     new Date(transaction.payment_time),
                     new Date(),
@@ -74,7 +74,7 @@ export default function TransactionsPage() {
                     }
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="dark:text-black">
                   {new Intl.NumberFormat("en-US", {
                     style: "currency",
                     currency: transaction.currency,

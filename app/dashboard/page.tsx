@@ -8,7 +8,7 @@ import { Loading } from "@/components/loading";
 import ErrorPage from "@/components/errorpage/ErrorPage";
 import { useAuth } from "@clerk/nextjs";
 import { useUser } from "@clerk/nextjs";
-import { Call } from "@prisma/client";
+import type { call } from ".prisma/client";
 
 interface Transaction {
   stripe_id: string;
@@ -24,7 +24,7 @@ interface TimelineItem {
 }
 
 interface CallsResponse {
-  calls: Call[];
+  calls: call[];
 }
 
 export default function OverviewPage() {
@@ -63,7 +63,7 @@ export default function OverviewPage() {
 
         // Only map calls if they exist
         if (callsData?.calls && callsData.calls.length > 0) {
-          callItems = callsData.calls.map((call: Call) => ({
+          callItems = callsData.calls.map((call: call) => ({
             type: "call",
             date: call.startedAt,
             data: call,

@@ -5,10 +5,10 @@ import CallsList from "./_components/CallsList";
 import SyncCalls from "./_components/SyncCalls";
 import { useUser } from "@clerk/nextjs";
 import { Loading } from "@/components/loading";
-import { Call } from "@prisma/client";
+import type { call } from ".prisma/client";
 
 export default function CallsPage() {
-  const [calls, setCalls] = useState<Call[]>([]);
+  const [calls, setCalls] = useState<call[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, isLoaded } = useUser();

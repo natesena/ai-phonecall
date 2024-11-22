@@ -1,15 +1,15 @@
 import { format, parseISO } from "date-fns";
 import CallLog from "./CallLog";
-import { Call } from "@prisma/client";
+import type { call } from ".prisma/client";
 
 interface CallsListProps {
-  calls: Call[];
+  calls: call[];
 }
 
 export default function CallsList({ calls }: CallsListProps) {
   // Group calls by date
   const groupedCalls = calls.reduce(
-    (groups: { [key: string]: Call[] }, call) => {
+    (groups: { [key: string]: call[] }, call) => {
       // Skip calls without startedAt date
       if (!call.startedAt) return groups;
 

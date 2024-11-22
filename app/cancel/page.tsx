@@ -53,16 +53,16 @@ export default function Cancel() {
 
           <div className="space-y-4">
             <p className="text-xl leading-7 text-gray-600 dark:text-gray-300">
-              Don't worry, you're definitely{" "}
+              Don&apos;t worry, you&apos;re definitely{" "}
               <span className="font-semibold text-green-600">
                 not on the naughty list!
               </span>
             </p>
 
             <p className="text-lg leading-7 text-gray-600 dark:text-gray-300">
-              Feeling a bit shy about talking to Santa? That's okay! Even the
-              elves get butterflies sometimes. Santa's just a jolly old fellow
-              who loves spreading Christmas cheer!
+              Feeling a bit shy about talking to Santa? That&apos;s okay! Even
+              the elves get butterflies sometimes. Santa&apos;s just a jolly old
+              fellow who loves spreading Christmas cheer!
             </p>
 
             <p className="text-lg leading-7 text-gray-600 dark:text-gray-300">

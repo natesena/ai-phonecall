@@ -19,7 +19,7 @@ export default function TransactionItem({
           <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
             <Banknote className="h-4 w-4 text-gray-600" />
           </div>
-          <span className="font-medium">
+          <span className="font-medium dark:text-black">
             {new Intl.NumberFormat("en-US", {
               style: "currency",
               currency: transaction.currency,
