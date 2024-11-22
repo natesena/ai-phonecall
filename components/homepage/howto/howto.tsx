@@ -1,8 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MobileHowTo } from "./mobile";
 import { DesktopHowTo } from "./desktop";
 

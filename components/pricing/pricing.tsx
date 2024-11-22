@@ -17,10 +17,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Band } from "@/components/homepage/band";
 
-type PricingSwitchProps = {
-  onSwitch: (value: string) => void;
-};
-
 type PricingCardProps = {
   user: any;
   handleCheckout: any;
@@ -29,8 +25,6 @@ type PricingCardProps = {
   description: string;
   features: string[];
   actionLabel: string;
-  popular?: boolean;
-  exclusive?: boolean;
   priceId: string;
 };
 
@@ -42,8 +36,6 @@ const PricingCard = ({
   description,
   features,
   actionLabel,
-  popular,
-  exclusive,
   priceId,
 }: PricingCardProps) => {
   const router = useRouter();

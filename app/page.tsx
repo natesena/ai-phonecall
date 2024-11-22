@@ -1,6 +1,6 @@
 import { AccordionComponent } from "@/components/homepage/accordion-component";
 import HeroSection from "@/components/homepage/hero-section";
-import Pricing from "@/components/homepage/pricing";
+import Pricing from "@/components/pricing/pricing";
 import PageWrapper from "@/components/wrapper/page-wrapper";
 import config from "@/config";
 import SnowScene from "@/components/homepage/three/snowScene";
