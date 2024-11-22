@@ -77,18 +77,21 @@ export default function Footer() {
                   <li>
                     <Link
                       target="_blank"
-                      href="/"
+                      href="/terms"
                       rel="noopener noreferrer"
                       className="  transition hover:opacity-75"
                     >
                       {" "}
-                      Docs{" "}
+                      Terms & Conditions{" "}
                     </Link>
                   </li>
                   <li>
-                    <Link href="/" className="  transition hover:opacity-75">
+                    <Link
+                      href="/privacy"
+                      className="  transition hover:opacity-75"
+                    >
                       {" "}
-                      Methodology{" "}
+                      Privacy Policy{" "}
                     </Link>
                   </li>
                 </ul>

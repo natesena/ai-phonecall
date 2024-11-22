@@ -93,3 +93,19 @@ Refer to the documentation of the individual technologies used in this project f
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Clerk Documentation](https://clerk.dev/docs) (if using auth)
 - [Stripe Documentation](https://stripe.com/docs) (if using payments)
+
+## Making Schema Changes
+
+When modifying the Prisma schema (`prisma/schema.prisma`):
+
+1. Edit the schema file with your changes
+2. Create a new migration:
+   ```bash
+   npx prisma migrate dev --name describe_your_changes
+   ```
+3. This command will:
+   - Create a new migration file
+   - Apply the migration to your database
+   - Regenerate the Prisma client
+
+Note: In development, you can also use `npx prisma db push` for quick schema prototyping, but migrations are recommended for production changes.

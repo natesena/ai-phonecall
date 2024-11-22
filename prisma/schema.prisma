@@ -84,7 +84,7 @@ model user_credits {
   @@unique([user_id, stripe_product_id])
 }
 
-model Call {
+model call {
   id              String    @id @default(uuid())
   callId          String    @unique @map("call_id")    // from webhook message.call.id
   userId          String?   @map("user_id")            // to be linked with clerk user_id
@@ -102,4 +102,19 @@ model Call {
   @@index([userId])
   @@index([customerPhone])
   @@map("calls")
+}
+
+model consent_record {
+  id              String    @id @default(cuid())
+  user_id         String
+  timestamp       DateTime  @default(now())
+  ip_address      String
+  user_agent      String
+  terms_version   String
+  privacy_version String
+  metadata        Json?     // Additional context like browser info, platform, etc.
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  @@index([user_id])
 }
