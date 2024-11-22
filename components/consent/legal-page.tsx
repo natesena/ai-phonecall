@@ -48,9 +48,8 @@ export default function LegalPage({ currentVersion, type }: LegalPageProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          terms_version: type === "terms" ? currentVersion.version : undefined,
-          privacy_version:
-            type === "privacy" ? currentVersion.version : undefined,
+          type,
+          version: currentVersion.version,
         }),
       });
 

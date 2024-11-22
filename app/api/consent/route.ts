@@ -8,7 +8,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { terms_version } = await request.json();
+  const { type, version } = await request.json();
+
+  // Validate type
+  if (type !== "terms" && type !== "privacy") {
+    return NextResponse.json(
+      { error: "Type must be either 'terms' or 'privacy'" },
+      { status: 400 }
+    );
+  }
+
   const headersList = request.headers;
   const ip = headersList.get("x-forwarded-for") || "unknown";
   const userAgent = headersList.get("user-agent") || "unknown";
@@ -17,8 +26,8 @@ export async function POST(request: NextRequest) {
     const consent = await prisma.consent_record.create({
       data: {
         user_id: userId,
-        terms_version,
-        privacy_version: "1.0",
+        type,
+        version,
         ip_address: ip,
         user_agent: userAgent,
       },

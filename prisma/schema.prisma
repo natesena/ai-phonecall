@@ -110,11 +110,12 @@ model consent_record {
   timestamp       DateTime  @default(now())
   ip_address      String
   user_agent      String
-  terms_version   String
-  privacy_version String
+  type            String    // "terms" or "privacy"
+  version         String
   metadata        Json?     // Additional context like browser info, platform, etc.
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
 
   @@index([user_id])
+  @@index([user_id, type, version])
 }
