@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
+import prisma from "@/lib/prisma";
 
 interface WebhookData {
   headers: Record<string, string>;
@@ -15,6 +16,12 @@ interface WebhookData {
       call: {
         id: string;
       };
+      assistant?: {
+        id: string;
+      };
+      user?: {
+        id: string; // This should be your Clerk user ID
+      };
     };
   };
 }
@@ -22,34 +29,99 @@ interface WebhookData {
 async function handleStatusUpdate(webhookData: WebhookData) {
   const status = webhookData.body.message.status;
   const customerPhone = webhookData.body.message.customer?.number;
+  const callId = webhookData.body.message.call?.id;
+  const assistantId = webhookData.body.message.assistant?.id;
+  const userId = webhookData.body.message.user?.id;
 
   switch (status) {
     case "in-progress":
-      // TODO: Attach metadata (like Clerk user ID) to the call
-      // TODO: Create initial call record in database
-      console.log(`Call started for customer ${customerPhone}`);
+      try {
+        await prisma.call.create({
+          data: {
+            callId: callId,
+            userId: userId,
+            customerPhone: customerPhone,
+            assistantId: assistantId || "default",
+            status: "in-progress",
+            startedAt: new Date(),
+          },
+        });
+        console.log(`Call record created for ${callId}`);
+      } catch (error) {
+        console.error("Failed to create call record:", error);
+      }
       break;
 
     case "ended":
-      // TODO: Update call record in database with end status
-      console.log(`Call ended for customer ${customerPhone}`);
+      console.log(
+        "Call ended webhook data:",
+        JSON.stringify(webhookData, null, 2)
+      );
+      try {
+        await prisma.call.update({
+          where: { callId: callId },
+          data: {
+            status: "ended",
+            endedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.error("Failed to update call record:", error);
+      }
       break;
   }
 }
 
 async function handleEndOfCallReport(webhookData: WebhookData) {
-  const { durationSeconds, customer } = webhookData.body.message;
-
-  // TODO: Define your threshold for crediting calls (e.g. 30 seconds)
+  const { durationSeconds, customer, user } = webhookData.body.message;
   const CREDIT_THRESHOLD_SECONDS = 30;
 
-  if (durationSeconds && durationSeconds > CREDIT_THRESHOLD_SECONDS) {
-    // TODO: Debit user credit
-    console.log(`Debiting credit for call lasting ${durationSeconds} seconds`);
-  }
+  if (
+    durationSeconds &&
+    durationSeconds > CREDIT_THRESHOLD_SECONDS &&
+    user?.id
+  ) {
+    try {
+      // Find the user's credits
+      const userCredits = await prisma.user_credits.findFirst({
+        where: {
+          user_id: user.id,
+        },
+      });
 
-  // TODO: Send email to user with call summary
-  console.log(`Sending call summary email to customer ${customer?.number}`);
+      if (!userCredits || userCredits.amount < 1) {
+        console.error(`No credits available for user ${user.id}`);
+        return;
+      }
+
+      // Update credits by removing 1
+      await prisma.user_credits.update({
+        where: {
+          id: userCredits.id,
+        },
+        data: {
+          amount: userCredits.amount - 1,
+        },
+      });
+
+      // Update call record with duration and cost
+      await prisma.call.update({
+        where: {
+          callId: webhookData.body.message.call.id,
+        },
+        data: {
+          durationSeconds: durationSeconds,
+          cost: 1, // Assuming 1 credit = 1 cost unit
+        },
+      });
+
+      console.log(
+        `Debited 1 credit from user ${user.id} for call lasting ${durationSeconds} seconds`
+      );
+    } catch (error) {
+      console.error("Failed to process credits:", error);
+    }
+  }
 }
 
 export async function POST(request: NextRequest) {

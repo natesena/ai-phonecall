@@ -9,15 +9,16 @@ datasource db {
 }
 
 model user {
-  id                Int      @id @default(autoincrement())
-  created_time      DateTime @default(now())
-  email             String   @unique
-  first_name        String?
-  last_name         String?
-  gender            String?
-  profile_image_url String?
-  user_id           String   @unique
+  id                 Int      @id @default(autoincrement())
+  created_time       DateTime @default(now())
+  email              String   @unique
+  first_name         String?
+  last_name          String?
+  gender             String?
+  profile_image_url  String?
+  user_id            String   @unique
   stripe_customer_id String?  @unique
+  phone_number       String?
 }
 
 model payments {
@@ -75,26 +76,26 @@ model invoices {
 }
 
 model user_credits {
-  id                Int      @id @default(autoincrement())
-  user_id           String   
-  stripe_product_id String   // Stripe's product ID
-  product_name      String   // Name of the product from Stripe
-  amount            Float    // Number of credits remaining
+  id                Int    @id @default(autoincrement())
+  user_id           String
+  stripe_product_id String
+  product_name      String
+  amount            Float
 
   @@unique([user_id, stripe_product_id])
 }
 
 model call {
   id              String    @id @default(uuid())
-  callId          String    @unique @map("call_id")    // from webhook message.call.id
-  userId          String?   @map("user_id")            // to be linked with clerk user_id
-  customerPhone   String    @map("customer_phone")     // from webhook message.customer.number
-  assistantId     String    @map("assistant_id")       // from webhook message.assistant.id
-  status          String                               // in-progress, ended, etc
+  callId          String    @unique @map("call_id")
+  userId          String?   @map("user_id")
+  customerPhone   String    @map("customer_phone")
+  assistantId     String    @map("assistant_id")
+  status          String
   startedAt       DateTime? @map("started_at")
   endedAt         DateTime? @map("ended_at")
   durationSeconds Int?      @map("duration_seconds")
-  endedReason     String?   @map("ended_reason")       // customer-ended-call, etc
+  endedReason     String?   @map("ended_reason")
   cost            Decimal?  @db.Decimal(10, 4)
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
@@ -105,16 +106,16 @@ model call {
 }
 
 model consent_record {
-  id              String    @id @default(cuid())
-  user_id         String
-  timestamp       DateTime  @default(now())
-  ip_address      String
-  user_agent      String
-  type            String    // "terms" or "privacy"
-  version         String
-  metadata        Json?     // Additional context like browser info, platform, etc.
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  user_id    String
+  timestamp  DateTime @default(now())
+  ip_address String
+  user_agent String
+  metadata   Json?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  type       String
+  version    String
 
   @@unique([user_id, type, version])
   @@index([user_id])

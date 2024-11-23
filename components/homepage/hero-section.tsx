@@ -5,7 +5,7 @@ export default function HeroSection() {
         className={`hero-title lobster-regular text-7xl scroll-m-20 font-semibold tracking-tight text-center max-w-[1120px] bg-gradient-to-b text-white`}
       >
         Call Santa
-        <span className="text-3xl"> . Shop</span>
+        {/* <span className="text-3xl"> . Shop</span> */}
       </h1>
       <p className="hero-subtitle lobster-regular text-2xl text-white">
         You call, Santa Answers!

@@ -155,13 +155,31 @@ Refer to the documentation of the individual technologies used in this project f
 When modifying the Prisma schema (`prisma/schema.prisma`):
 
 1. Edit the schema file with your changes
-2. Create a new migration:
+2. Create and apply a new migration:
+
    ```bash
+   # Create a new migration
+   npx prisma migrate dev --name describe_your_changes
+
+   # If changes aren't detected, try:
+   rm -rf node_modules/.prisma
+   npx prisma generate
    npx prisma migrate dev --name describe_your_changes
    ```
+
 3. This command will:
-   - Create a new migration file
+   - Create a new migration file in `prisma/migrations`
    - Apply the migration to your database
    - Regenerate the Prisma client
 
-Note: In development, you can also use `npx prisma db push` for quick schema prototyping, but migrations are recommended for production changes.
+Note: While `npx prisma db push` can be used for quick schema prototyping in development, always use migrations (`prisma migrate`) for production changes as they:
+
+- Provide version control for your database schema
+- Allow you to roll back changes if needed
+- Create a traceable history of database modifications
+
+For production deployments, use:
+
+```bash
+npx prisma migrate deploy
+```

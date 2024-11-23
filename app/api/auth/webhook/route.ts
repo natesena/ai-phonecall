@@ -36,12 +36,6 @@ export async function POST(req: Request) {
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
-  console.log("Webhook Headers:", {
-    svix_id,
-    svix_timestamp,
-    svix_signature,
-  });
-
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
     return new Response("Error occured -- no svix headers", {
@@ -51,8 +45,8 @@ export async function POST(req: Request) {
 
   // Get the body
   const payload = await req.json();
+
   const body = JSON.stringify(payload);
-  console.log("Webhook Body:", body);
 
   // Create a new SVIX instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -71,6 +65,8 @@ export async function POST(req: Request) {
       type: evt.type,
       data: evt.data,
     });
+
+    console.log((evt.data as any)?.phone_numbers);
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
@@ -79,7 +75,6 @@ export async function POST(req: Request) {
   }
 
   // Get the ID and type
-  const { id } = evt.data;
   const eventType = evt.type;
 
   switch (eventType) {
@@ -91,6 +86,7 @@ export async function POST(req: Request) {
           last_name: payload?.data?.last_name,
           profile_image_url: payload?.data?.profile_image_url,
           user_id: payload?.data?.id,
+          phone_number: payload?.data?.phone_numbers?.[0]?.phone_number,
         });
 
         return NextResponse.json({
@@ -144,6 +140,7 @@ export async function POST(req: Request) {
             last_name: payload?.data?.last_name,
             profile_image_url: payload?.data?.profile_image_url,
             user_id: payload?.data?.id,
+            phone_number: payload?.data?.phone_numbers?.[0]?.phone_number,
           });
         }
 
