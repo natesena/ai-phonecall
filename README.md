@@ -65,7 +65,6 @@
    ```
 
 6. Start the development server:
-   https://4226-67-245-16-134.ngrok-free.app
 
    ```
    yarn dev
@@ -78,17 +77,56 @@
 - `/api/auth/webhook`
   - Inputs: Webhook data from Clerk
   - Outputs: None
+- `api/calls`
+  - Used for posting a call from within the VAPI Webhook Logic in `/api/vapi/webhooks/route.ts`
+  - Inputs: Call data
+  - Outputs: None
 - `/api/calls/sync`
-  - Description: (CAREFUL)Syncs all calls from VAPI to the database. This incorrectly assumes that all calls are from the requesting user. This needs to be fixed.
+  - Description: (CAREFUL) Syncs all calls from VAPI to the database. This incorrectly assumes that all calls are from the requesting user. This needs to be fixed.
   - Inputs: None
   - Outputs: All calls synced from VAPI
 - `/api/calls/total`
   - Description: Gets the total number of calls from the database for use on the homepage.
   - Inputs: None
   - Outputs: Total number of calls
+- `/api/consent`
+  - (GET) Checks to see if the user has consented to the terms of service or privacy policy. Currently, there is only one version of each, but this could be extended in the future to search for only the latest version.
+  - (POST) Records a user's consent to the terms of service or privacy policy.
+    - Inputs: consent type (either "terms" or "privacy") and version
+    - Outputs: None
+- `/api/credits`
+  - (GET) Gets the number of credits the user has remaining.
+  - (POST) Records a user's purchase of credits.
+    - Inputs: number of credits purchased
+    - Outputs: None
+- `/api/payments/create-checkout-session`
+  - Inputs: userId, email, priceId, subscription
+    - userId: The user's Clerk ID
+    - email: The user's email
+    - priceId: The Stripe price ID for a single line item
+    - subscription: Whether the user is subscribing or purchasing credits
+    - (Note) The user's intent is to either buy a single line item or subscribe.
+  - Outputs: Checkout session
+- `/api/payments/webhook`
+  - Inputs: Webhook data from Stripe
+  - Outputs: None
+- `api/payments/query`
+  - Inputs: userId via the request (not via params or request body)
+  - Outputs: All payments for the user
 - `/api/vapi/call/[id]`
   - Inputs: a single callId
   - Outputs: Detailed call information directly from VAPI
+- `/api/vapi/calls`
+  - Inputs: None
+  - Outputs: All calls (Note: This is not currently used by the frontend)
+- `/api/vapi/numbers`
+  - Description: Gets information about a phone number from VAPI. Only works for Vapi providers rather than the general number lookup.
+  - Inputs: phoneNumber
+  - Outputs: Phone number information directly from VAPI
+- `api/vapi/numid`
+  - Description: Not currently used by the frontend.
+  - Inputs: Phonenumber/s
+  - Outputs: A single phone number and phone number id
 
 ## Additional Configuration
 

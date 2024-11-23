@@ -9,15 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { phoneNumber } = await request.json();
-
-    if (!phoneNumber) {
-      return NextResponse.json(
-        { error: "Phone number is required" },
-        { status: 400 }
-      );
-    }
-
     // Fetch calls from VAPI
     const response = await fetch("https://api.vapi.ai/call", {
       method: "GET",
@@ -41,7 +32,6 @@ export async function POST(request: NextRequest) {
     console.error("VAPI API Error:", {
       error,
       path: "/api/vapi/calls",
-      phoneNumber: request.body,
     });
 
     return NextResponse.json(
