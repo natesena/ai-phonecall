@@ -4,25 +4,6 @@ import { userCreateProps } from "@/utils/types";
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 
-// Log the available properties
-type Debug = Prisma.userCreateInput;
-console.log("Available properties:", Object.keys(prisma.user.fields));
-
-// Create a type helper function to see the full type structure
-type InspectType<T> = T extends object ? { [K in keyof T]: T[K] } : T;
-
-// Inspect the exact types Prisma is generating
-type UserUpdateInputType = InspectType<Prisma.userUpdateInput>;
-type UserCreateInputType = InspectType<Prisma.userCreateInput>;
-
-// Create a development-only type check
-const typeCheck: UserUpdateInputType = {} as any;
-const createCheck: UserCreateInputType = {} as any;
-
-// Add this temporarily
-const debug: Prisma.userUpdateInput = {} as any;
-console.log("Update Input Type:", Object.keys(debug));
-
 export const userCreate = async ({
   email,
   first_name,
@@ -71,6 +52,20 @@ export const userCreate = async ({
       message: error.message,
       stack: error.stack,
     });
+
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+      return {
+        code: "CONNECTION_ERROR",
+        message: "Unable to connect to the database. Please try again later.",
+      };
+    }
+
+    if (error.code === "42501") {
+      return {
+        code: "42501",
+        message: "Insufficient permissions to perform this operation",
+      };
+    }
 
     if (error.code === "P2002") {
       return {

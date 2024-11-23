@@ -7,7 +7,7 @@ declare global {
 const prisma =
   global.prisma ||
   new PrismaClient({
-    log: ["query", "error", "warn"], // Adds detailed logging
+    // log: ["query", "error", "warn"], // Adds detailed logging
     datasources: {
       db: {
         url: process.env.DATABASE_URL,

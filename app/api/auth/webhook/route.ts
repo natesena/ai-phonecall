@@ -65,8 +65,6 @@ export async function POST(req: Request) {
       type: evt.type,
       data: evt.data,
     });
-
-    console.log((evt.data as any)?.phone_numbers);
   } catch (err) {
     console.error("Error verifying webhook:", err);
     return new Response("Error occured", {

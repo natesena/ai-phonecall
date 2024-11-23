@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Loading } from "@/components/loading";
+import CheckoutFlow from "@/components/checkout-flow/checkout-flow";
+
 interface CreditType {
   product_name: string;
   amount: number;
@@ -39,19 +41,27 @@ export default function CreditsPage() {
       <h1 className="text-2xl font-bold mb-6 text-white text-shadow-lg">
         Credits Overview
       </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {credits.map((credit) => (
-          <Card key={credit.product_name}>
-            <CardHeader>
-              <CardTitle className="text-lg">{credit.product_name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">{credit.amount}</p>
-              <p className="text-sm text-muted-foreground">Remaining calls</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {credits.length === 0 ? (
+        <CheckoutFlow
+          title="Get Started with Credits"
+          description="Purchase credits to start making calls with Santa"
+          buttonText="Purchase Credits"
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {credits.map((credit) => (
+            <Card key={credit.product_name}>
+              <CardHeader>
+                <CardTitle className="text-lg">{credit.product_name}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">{credit.amount}</p>
+                <p className="text-sm text-muted-foreground">Remaining calls</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

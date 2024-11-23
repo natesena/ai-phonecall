@@ -72,16 +72,46 @@ async function handleStatusUpdate(webhookData: WebhookData) {
   }
 }
 
+async function fetchUserByPhoneNumber(phoneNumber: string) {
+  try {
+    const response = await fetch(
+      `${process.env.FRONTEND_URL}/api/numbers/clerk/user-id-from-phone-number`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.users || [];
+  } catch (error) {
+    console.error("Error fetching user by phone number:", error);
+    return null;
+  }
+}
+
 async function handleEndOfCallReport(webhookData: WebhookData) {
-  const { durationSeconds, customer, user } = webhookData.body.message;
+  const { durationSeconds } = webhookData.body.message;
+  const { number } = webhookData.body.message.customer;
   const CREDIT_THRESHOLD_SECONDS = 30;
 
-  if (
-    durationSeconds &&
-    durationSeconds > CREDIT_THRESHOLD_SECONDS &&
-    user?.id
-  ) {
+  if (number) {
     try {
+      const users = await fetchUserByPhoneNumber(number);
+      let user;
+      if (users.length === 0) {
+        console.error(`No user found for phone number ${number}`);
+        return;
+      } else {
+        user = users[0];
+      }
       // Find the user's credits
       const userCredits = await prisma.user_credits.findFirst({
         where: {
