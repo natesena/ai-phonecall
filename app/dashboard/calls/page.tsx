@@ -12,6 +12,8 @@ export default function CallsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, isLoaded } = useUser();
+  const isLocalhost =
+    typeof window !== "undefined" && window.location.hostname === "localhost";
 
   const fetchCalls = async () => {
     if (!isLoaded) return;
@@ -56,7 +58,7 @@ export default function CallsPage() {
     <div className="container mx-auto max-w-4xl space-y-8 overflow-hidden">
       {calls.length > 0 ? (
         <>
-          <SyncCalls onSyncComplete={fetchCalls} />
+          {isLocalhost && <SyncCalls onSyncComplete={fetchCalls} />}
           <CallsList calls={calls} />
         </>
       ) : (
@@ -66,7 +68,7 @@ export default function CallsPage() {
             <p className="text-2xl">Santa Misses You</p>
           </div>
           <div className="pt-4">
-            <SyncCalls onSyncComplete={fetchCalls} />
+            {isLocalhost && <SyncCalls onSyncComplete={fetchCalls} />}
           </div>
         </div>
       )}
