@@ -1,4 +1,4 @@
-"server only"
+"server only";
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
@@ -36,52 +36,24 @@ export const testSupabaseConnection = async () => {
       .from("user")
       .select("*")
       .limit(1);
-    
+
     console.log("Select test result:", {
       success: !testError,
       data: testData,
-      error: testError
-    });
-
-    // Test insert with dummy data
-    console.log("Testing insert capability...");
-    const { data: insertData, error: insertError } = await supabase
-      .from("user")
-      .insert([
-        {
-          email: "test@test.com",
-          first_name: "Test",
-          last_name: "User",
-          user_id: "test_" + Date.now(),
-        },
-      ])
-      .select();
-
-    console.log("Insert test result:", {
-      success: !insertError,
-      data: insertData,
-      error: insertError,
-      errorDetails: {
-        code: insertError?.code,
-        message: insertError?.message,
-        details: insertError?.details,
-        hint: insertError?.hint
-      }
+      error: testError,
     });
 
     return {
       connection: "success",
       selectTest: { data: testData, error: testError },
-      insertTest: { data: insertData, error: insertError }
     };
-
   } catch (error: any) {
     console.error("Test failed:", {
       message: error.message,
       stack: error.stack,
       name: error.name,
-      cause: error.cause
+      cause: error.cause,
     });
     throw new Error(`Supabase test failed: ${error.message}`);
   }
-}; 
+};

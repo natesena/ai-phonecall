@@ -56,6 +56,7 @@ export default function CallsPage() {
     <div className="container mx-auto max-w-4xl space-y-8 overflow-hidden">
       {calls.length > 0 ? (
         <>
+          <SyncCalls onSyncComplete={fetchCalls} />
           <CallsList calls={calls} />
         </>
       ) : (

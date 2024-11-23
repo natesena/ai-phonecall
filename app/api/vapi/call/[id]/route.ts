@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
+// Inputs: a single callId
+// Outputs: Detailed call information directly from VAPI
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

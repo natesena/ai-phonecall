@@ -65,12 +65,30 @@
    ```
 
 6. Start the development server:
+   https://4226-67-245-16-134.ngrok-free.app
 
    ```
    yarn dev
    ```
 
 7. Open your browser and navigate to `http://localhost:3000` to see your application running.
+
+## Routes / API
+
+- `/api/auth/webhook`
+  - Inputs: Webhook data from Clerk
+  - Outputs: None
+- `/api/calls/sync`
+  - Description: (CAREFUL)Syncs all calls from VAPI to the database. This incorrectly assumes that all calls are from the requesting user. This needs to be fixed.
+  - Inputs: None
+  - Outputs: All calls synced from VAPI
+- `/api/calls/total`
+  - Description: Gets the total number of calls from the database for use on the homepage.
+  - Inputs: None
+  - Outputs: Total number of calls
+- `/api/vapi/call/[id]`
+  - Inputs: a single callId
+  - Outputs: Detailed call information directly from VAPI
 
 ## Additional Configuration
 
