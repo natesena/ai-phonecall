@@ -37,6 +37,31 @@ export async function POST(request: NextRequest) {
             new Date(call.startedAt).getTime()) /
             1000
         );
+
+        // Get userId from phone number lookup
+        let userId = null;
+        try {
+          const userResponse = await fetch(
+            `${process.env.FRONTEND_URL}/api/numbers/clerk/user-id-from-phone-number`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ phoneNumber: call.customer?.number }),
+            }
+          );
+
+          const userData = await userResponse.json();
+          if (userData.users && userData.users.length > 0) {
+            userId = userData.users[0].id;
+          }
+        } catch (error) {
+          console.error("Error looking up userId from phone number:", error);
+        }
+
+        const callUserId = userId;
+
         const result = await prisma.call.upsert({
           where: { callId: call.id },
           update: {
@@ -48,7 +73,7 @@ export async function POST(request: NextRequest) {
             assistantId: call.assistantId,
             endedReason: call.endedReason,
             cost: call.cost,
-            userId: userId,
+            userId: callUserId,
           },
           create: {
             callId: call.id,
@@ -60,7 +85,7 @@ export async function POST(request: NextRequest) {
             assistantId: call.assistantId,
             endedReason: call.endedReason,
             cost: call.cost,
-            userId: userId,
+            userId: callUserId,
           },
         });
 

@@ -52,7 +52,6 @@ export async function handleCheckoutSessionCompleted(
     }
   } else {
     // One-time payment logic
-    console.log("One-time payment logic");
     const dateTime = new Date(session.created * 1000).toISOString();
     try {
       const user = await prisma.user.findUnique({
