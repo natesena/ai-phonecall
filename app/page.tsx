@@ -59,7 +59,7 @@ export default async function Home() {
         <div className="flex flex-col justify-center items-center w-full p-3 my-[5rem] sm:my-[7rem]">
           <HowTo />
         </div>
-        <div className="relative bg-[#840000] faq-section flex justify-center items-center w-full">
+        <div className="relative bg-[#7F0000] faq-section flex justify-center items-center w-full">
           <AccordionComponent />
         </div>
       </div>
