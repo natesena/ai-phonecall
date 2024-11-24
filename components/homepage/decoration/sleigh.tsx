@@ -3,7 +3,7 @@ import React from "react";
 export const Sleigh = () => {
   return (
     <div
-      className="sleigh container-svg overflow-hidden"
+      className="sleigh container-svg"
       style={{ width: "800px", height: "600px" }}
     >
       <svg

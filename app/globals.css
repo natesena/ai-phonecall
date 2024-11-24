@@ -268,3 +268,7 @@ main {
 .animate-fall-slow {
   animation: fall 13s linear infinite;
 }
+
+.sleigh-component-container {
+  inset: 0;
+}

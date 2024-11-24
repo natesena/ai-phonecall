@@ -43,11 +43,11 @@ export default async function Home() {
                 <Pricing />
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center w-full my-[1rem] sm:my-[7rem] px-4 mb-16 relative">
-              <div className="absolute transform -translate-x-[25%] translate-y-[50%] sleigh-diagonal">
+            <div className="call-counter flex flex-col justify-center items-center max-w-full relative overflow-x-clip">
+              <div className="sleigh-component-container absolute transform -translate-x-[25%] translate-y-[50%] sleigh-diagonal">
                 <Sleigh />
               </div>
-              <p className="lobster-regular text-center text-5xl text-white mx-auto relative z-10">
+              <p className="lobster-regular text-center text-5xl text-white mx-auto relative z-10 my-[1rem] sm:my-[7rem] px-4 mb-16">
                 {formatNumber(count)} calls and counting!
               </p>
             </div>
