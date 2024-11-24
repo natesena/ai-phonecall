@@ -52,20 +52,20 @@ export default function Cancel() {
           </h1>
 
           <div className="space-y-4">
-            <p className="text-xl leading-7 text-gray-600 dark:text-gray-300">
+            <p className="text-xl leading-7 text-white">
               Don&apos;t worry, you&apos;re definitely{" "}
               <span className="font-semibold text-green-600">
                 not on the naughty list!
               </span>
             </p>
 
-            <p className="text-lg leading-7 text-gray-600 dark:text-gray-300">
+            <p className="text-lg leading-7 text-white">
               Feeling a bit shy about talking to Santa? That&apos;s okay! Even
               the elves get butterflies sometimes. Santa&apos;s just a jolly old
               fellow who loves spreading Christmas cheer!
             </p>
 
-            <p className="text-lg leading-7 text-gray-600 dark:text-gray-300">
+            <p className="text-lg leading-7 text-white">
               Ready to give it another try? The reindeer are waiting!{" "}
               <span className="text-2xl">🦌✨</span>
             </p>

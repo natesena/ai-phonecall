@@ -53,10 +53,6 @@ async function handleStatusUpdate(webhookData: WebhookData) {
       break;
 
     case "ended":
-      console.log(
-        "Call ended webhook data:",
-        JSON.stringify(webhookData, null, 2)
-      );
       try {
         await prisma.call.update({
           where: { callId: callId },
@@ -124,30 +120,40 @@ async function handleEndOfCallReport(webhookData: WebhookData) {
         return;
       }
 
-      // Update credits by removing 1
-      await prisma.user_credits.update({
-        where: {
-          id: userCredits.id,
-        },
-        data: {
-          amount: userCredits.amount - 1,
-        },
-      });
+      if (durationSeconds && durationSeconds >= CREDIT_THRESHOLD_SECONDS) {
+        // Update credits by removing 1
+        await prisma.user_credits.update({
+          where: {
+            id: userCredits.id,
+          },
+          data: {
+            amount: userCredits.amount - 1,
+          },
+        });
 
-      // Update call record with duration and cost
-      await prisma.call.update({
-        where: {
-          callId: webhookData.body.message.call.id,
-        },
-        data: {
-          durationSeconds: durationSeconds,
-          cost: 1, // Assuming 1 credit = 1 cost unit
-        },
-      });
-
-      console.log(
-        `Debited 1 credit from user ${user.id} for call lasting ${durationSeconds} seconds`
-      );
+        // Update call record with duration and cost
+        await prisma.call.update({
+          where: {
+            callId: webhookData.body.message.call.id,
+          },
+          data: {
+            durationSeconds: durationSeconds,
+            cost: 1, // Assuming 1 credit = 1 cost unit
+          },
+        });
+        console.log(
+          `Debited 1 credit from user ${user.id} for call lasting ${durationSeconds} seconds`
+        );
+      } else {
+        await prisma.call.update({
+          where: {
+            callId: webhookData.body.message.call.id,
+          },
+          data: {
+            durationSeconds: durationSeconds,
+          },
+        });
+      }
     } catch (error) {
       console.error("Failed to process credits:", error);
     }

@@ -69,7 +69,7 @@ export default function LegalPage({ currentVersion, type }: LegalPageProps) {
     <PageWrapper showFooter={true}>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">{getTitle(type)}</h1>
+          <h1 className="text-3xl font-bold text-white">{getTitle(type)}</h1>
           {userId && (
             <div className="text-sm">
               {localConsent ? (
@@ -84,13 +84,13 @@ export default function LegalPage({ currentVersion, type }: LegalPageProps) {
             </div>
           )}
         </div>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 ">
           Version: {currentVersion.version}
         </p>
         <p className="text-sm text-gray-400 mb-8">
           Last Updated: {currentVersion.lastUpdated}
         </p>
-        <div className="whitespace-pre-wrap prose prose-invert">
+        <div className="whitespace-pre-wrap prose prose-invert text-white">
           {currentVersion.content}
         </div>
 

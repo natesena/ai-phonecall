@@ -74,11 +74,11 @@ export function ConsentModal({
               htmlFor="consent"
               className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              I agree to the{" "}
+              I confirm that I am at least 18 years old and I agree to the{" "}
               <Link
                 href="/terms"
                 target="_blank"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline font-bold"
               >
                 Terms of Service
               </Link>{" "}
@@ -86,7 +86,7 @@ export function ConsentModal({
               <Link
                 href="/privacy"
                 target="_blank"
-                className="text-primary hover:underline"
+                className="text-primary hover:underline font-bold"
               >
                 Privacy Policy
               </Link>
