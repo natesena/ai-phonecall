@@ -38,7 +38,7 @@ export default function Navbar() {
             <Image
               src={
                 process.env.NODE_ENV === "production"
-                  ? "https://storage.cloud.google.com/callsanta/images/homepage/gold-ornament-small.png"
+                  ? "https://storage.googleapis.com/callsanta/images/homepage/gold-ornament-small.png"
                   : "/images/homepage/gold-ornament-small.png"
               }
               alt="Logo"
