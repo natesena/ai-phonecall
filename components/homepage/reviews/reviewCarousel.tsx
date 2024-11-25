@@ -15,7 +15,7 @@ const getImagePath = (imageName: string) => {
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "/images/reviews/"
-      : "https://storage.googleapis.com/callsanta/images/review-headshots/";
+      : "https://storage.cloud.google.com/callsanta/images/review-headshots/";
 
   return `${baseUrl}${imageName}`;
 };

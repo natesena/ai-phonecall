@@ -50,8 +50,9 @@ export function AccordionComponent() {
           </AccordionTrigger>
           <AccordionContent className="w-full">
             <p className="accordion-answer">
-              Yes, there is a &quot;calls&quot; section in the dashboard where
-              you can read the transcript and download a .wav file of your call.
+              Due to privacy concerns around children, we do not store the call
+              at this time, however we are looking to update this in the near
+              future.
             </p>
           </AccordionContent>
         </AccordionItem>
