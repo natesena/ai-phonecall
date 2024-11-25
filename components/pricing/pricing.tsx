@@ -99,7 +99,7 @@ export default function Pricing() {
       price: 5,
       description: "Speak with jolly old St.Nick himself",
       features: [
-        "1x 5 minute call with Santa",
+        "3x 2 minute calls with Santa",
         "No milk & cookies necessary",
         "Chimney-proof guarantee",
       ],
