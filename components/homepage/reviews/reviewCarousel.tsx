@@ -11,11 +11,20 @@ interface ReviewCarouselProps {
 
 const emojiList = ["🎁", "⛄", "🎄", "🎅", "🍪", "🥛", "🦌", "☃️"];
 
+const getImagePath = (imageName: string) => {
+  const baseUrl =
+    process.env.NODE_ENV === "development"
+      ? "/images/reviews/"
+      : "https://storage.googleapis.com/callsanta/images/review-headshots/";
+
+  return `${baseUrl}${imageName}`;
+};
+
 const reviews = [
   {
     decoration: "🎁",
     reviewerName: "Sarah Johnson",
-    reviewerImage: "/reviews/sarah.jpg",
+    reviewerImage: getImagePath("frosty.png"),
     rating: "🎁 🎁 🎁 🎁 🎁",
     reviewText:
       "Santa's call made my children's Christmas magical! The personalized experience was incredible.",
@@ -23,7 +32,7 @@ const reviews = [
   {
     decoration: "🎄",
     reviewerName: "Michael Chen",
-    reviewerImage: "/reviews/michael.jpg",
+    reviewerImage: getImagePath("gingerbread.png"),
     rating: "⭐ ⭐ ⭐ ⭐ ⭐",
     reviewText:
       "Worth every penny! My kids were absolutely thrilled to talk to Santa directly.",
@@ -31,7 +40,7 @@ const reviews = [
   {
     decoration: "🎁",
     reviewerName: "Emma Williams",
-    reviewerImage: "/reviews/emma.jpg",
+    reviewerImage: getImagePath("rudolph.png"),
     rating: "🍪 🥛 🍪 🥛 🍪",
     reviewText:
       "Such a wonderful Christmas tradition. Will definitely do this again next year!",

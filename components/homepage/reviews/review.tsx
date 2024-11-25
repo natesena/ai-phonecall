@@ -19,14 +19,14 @@ export default function Review({
   return (
     <div className="relative bg-white rounded-lg p-6 shadow-lg w-full max-w-[280px] sm:max-w-[400px] my-4">
       <span
-        className="absolute -left-2 -top-2 text-2xl animate-bounce"
+        className="absolute -left-2 -top-2 text-4xl animate-bounce"
         aria-hidden="true"
       >
         {decoration}
       </span>
 
       <span
-        className="absolute -right-2 -bottom-2 text-2xl animate-bounce"
+        className="absolute -right-2 -bottom-2 text-4xl animate-bounce"
         aria-hidden="true"
       >
         {decoration}

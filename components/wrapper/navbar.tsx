@@ -13,7 +13,7 @@ import {
 import config from "@/config";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
-
+import Image from "next/image";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Marketing Page",
@@ -35,7 +35,16 @@ export default function Navbar() {
       <NavigationMenu>
         <NavigationMenuList className="flex gap-3 w-[100%] justify-between">
           <Link href="/" className="pl-2 flex items-center" aria-label="Home">
-            <TreePine aria-hidden="true" className="text-green-600" />
+            <Image
+              src={
+                process.env.NODE_ENV === "production"
+                  ? "https://storage.cloud.google.com/callsanta/images/homepage/gold-ornament-small.png"
+                  : "/images/homepage/gold-ornament-small.png"
+              }
+              alt="Logo"
+              width={40}
+              height={40}
+            />
             <span className="sr-only">Home</span>
           </Link>
           {userId && (

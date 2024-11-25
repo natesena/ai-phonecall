@@ -91,7 +91,7 @@ main {
     180deg,
     #9c0000 0%,
     rgba(136, 0, 0, 1) 56%,
-    rgba(113, 0, 0, 1) 100%
+    #710000 100%
   );
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#9c0000",endColorstr="#710000",GradientType=1);
 }

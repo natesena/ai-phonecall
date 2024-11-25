@@ -28,6 +28,11 @@ export default function AudioPlayer() {
     };
   }, []);
 
+  const audioSource =
+    process.env.NODE_ENV === "development"
+      ? "/audio/sleigh-bells.mp3"
+      : "https://storage.cloud.google.com/callsanta/audio/sleigh-bells.mp3";
+
   return (
     <audio
       ref={audioRef}
@@ -37,7 +42,7 @@ export default function AudioPlayer() {
       className="z-50"
       onPlay={() => console.log("Audio is playing")} // For debugging
     >
-      <source src="/audio/sleigh-bells.mp3" type="audio/mpeg" />
+      <source src={audioSource} type="audio/mpeg" />
       Your browser does not support the audio element.
     </audio>
   );
