@@ -11,7 +11,7 @@ const siteDescription = "Have a real phone call with Santa.";
 const siteName = "CallSanta.Shop";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://starter.rasmic.xyz"),
+  metadataBase: new URL("https://callsanta.shop"),
   title: {
     default: siteName,
     template: `%s | ${siteName}`,
@@ -20,19 +20,19 @@ export const metadata: Metadata = {
   openGraph: {
     description: siteDescription,
     images: [
-      "https://utfs.io/f/8a428f85-ae83-4ca7-9237-6f8b65411293-eun6ii.png",
+      "https://storage.cloud.google.com/tnc-public-files/images/CallSantaOpenGraph.png",
     ],
-    url: "https://starter.rasmic.xyz/",
+    url: "https://callsanta.shop/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nextjs Starter Kit",
+    title: "CallSanta.Shop",
     description: siteDescription,
     siteId: "",
-    creator: "@rasmic",
+    creator: "",
     creatorId: "",
     images: [
-      "https://utfs.io/f/8a428f85-ae83-4ca7-9237-6f8b65411293-eun6ii.png",
+      "https://storage.cloud.google.com/tnc-public-files/images/CallSantaOpenGraph.png",
     ],
   },
 };
