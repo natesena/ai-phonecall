@@ -29,7 +29,7 @@ export function SantaCallCard({ phoneNumber }: SantaCallCardProps) {
               </p>
             </a>
           </div>
-          <p className="lobster-regular text-gold-200 text-lg mt-4">
+          <p className="lobster-regular text-gold-200 text-lg mt-4 text-white">
             ✨ Santa&apos;s Waiting ! ✨
           </p>
         </div>

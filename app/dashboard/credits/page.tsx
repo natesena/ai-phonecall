@@ -52,7 +52,29 @@ export default function CreditsPage() {
           buttonText="Purchase Credits"
         />
       ) : (
-        <SantaCallCard phoneNumber={santaPhoneNumber} />
+        <>
+          <Card>
+            <CardHeader>
+              <CardTitle>Your Credits</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {credits.map((credit, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center"
+                  >
+                    <span>{credit.product_name}</span>
+                    <span className="font-semibold">
+                      {credit.amount} credits
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          <SantaCallCard phoneNumber={santaPhoneNumber} />
+        </>
       )}
     </div>
   );
