@@ -103,8 +103,8 @@ export default function Pricing() {
         "No milk & cookies necessary",
         "Chimney-proof guarantee",
       ],
-      priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID as string,
-      productId: process.env.NEXT_PUBLIC_1_CALL_PROD_ID as string,
+      priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string,
+      productId: process.env.NEXT_PUBLIC_3_CALL_PROD_ID as string,
       actionLabel: "Buy Credit",
     },
   ];
