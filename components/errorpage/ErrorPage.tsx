@@ -25,8 +25,8 @@ export default function ErrorPage({
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-white transition-colors"
           >
-            <HomeIcon className="h-5 w-5" />
-            <span>Return Home</span>
+            <HomeIcon className="h-5 w-5 text-black" />
+            <span className="text-black">Return Home</span>
           </Link>
         )}
       </div>
