@@ -93,12 +93,12 @@ export default function CheckoutFlow({
 
     if (hasTermsConsent && hasPrivacyConsent) {
       console.log("proceeding to checkout");
-      proceedToCheckout(5, process.env.NEXT_PUBLIC_1_CALL_PRICE_ID as string);
+      proceedToCheckout(5, process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string);
     } else {
       console.log("showing consent modal");
       setPendingCheckout({
         price: 5,
-        priceId: process.env.NEXT_PUBLIC_1_CALL_PRICE_ID as string,
+        priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string,
       });
       setShowConsentModal(true);
     }
