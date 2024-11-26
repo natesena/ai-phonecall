@@ -133,11 +133,12 @@ export default function OverviewPage() {
         <div className="space-y-8">
           <div className="text-center space-y-4">
             <h2 className="text-xl text-white">
-              Welcome to Santa's Magical Phone Line! 🎄
+              Welcome to Santa&apos;s Magical Phone Line! 🎄
             </h2>
             <p className="text-gray-300">
               Your journey with Santa begins with purchasing credits. Once you
-              have credits, you'll see all your North Pole activity right here.
+              have credits, you&apos;ll see all your North Pole activity right
+              here.
             </p>
           </div>
 
