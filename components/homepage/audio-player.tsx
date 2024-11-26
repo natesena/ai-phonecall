@@ -31,7 +31,7 @@ export default function AudioPlayer() {
   const audioSource =
     process.env.NODE_ENV === "development"
       ? "/audio/sleigh-bells.mp3"
-      : "https://storage.cloud.google.com/callsanta/audio/sleigh-bells.mp3";
+      : "https://storage.googleapis.com/callsanta/audio/sleigh-bells.mp3";
 
   return (
     <audio

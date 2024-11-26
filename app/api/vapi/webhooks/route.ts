@@ -36,6 +36,11 @@ async function handleStatusUpdate(webhookData: WebhookData) {
   switch (status) {
     case "in-progress":
       try {
+        // {
+        //   "messageResponse": {
+        //     "error": "error"
+        //   }
+        // }
         await prisma.call.create({
           data: {
             callId: callId,
@@ -47,7 +52,38 @@ async function handleStatusUpdate(webhookData: WebhookData) {
           },
         });
         console.log(`Call record created for ${callId}`);
+        // Check if the user has credits
+        const users = await fetchUserByPhoneNumber(customerPhone);
+        let user;
+        if (users.length === 0) {
+          console.error(`No user found for phone number ${customerPhone}`);
+          return;
+        } else {
+          user = users[0];
+        }
+
+        const userCredits = await prisma.user_credits.findFirst({
+          where: {
+            user_id: user.id,
+          },
+        });
+        console.log(`User credits: ${JSON.stringify(userCredits)}`);
+
+        if (!userCredits || userCredits.amount < 1) {
+          console.log(
+            `User ${user.id} has no credits or has 0 credits. Ending call.`
+          );
+          throw new Error("INSUFFICIENT_CREDITS");
+        }
       } catch (error) {
+        if (error.message === "INSUFFICIENT_CREDITS") {
+          return {
+            messageResponse: {
+              error:
+                "Ho Ho Ho, Who gave you my number? Visit callsanta.shop to buy credits to talk to me",
+            },
+          };
+        }
         console.error("Failed to create call record:", error);
       }
       break;
@@ -163,16 +199,16 @@ async function handleEndOfCallReport(webhookData: WebhookData) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
     const webhookData: WebhookData = {
       headers: Object.fromEntries(request.headers),
       body: body,
     };
 
+    let response;
     switch (webhookData.body.message.type) {
       case "status-update":
         console.log("Status update webhook received");
-        await handleStatusUpdate(webhookData);
+        response = await handleStatusUpdate(webhookData);
         break;
 
       case "end-of-call-report":
@@ -182,6 +218,10 @@ export async function POST(request: NextRequest) {
 
       default:
         console.log(`Unhandled webhook type: ${webhookData.body.message.type}`);
+    }
+
+    if (response) {
+      return NextResponse.json(response, { status: 200 });
     }
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {
