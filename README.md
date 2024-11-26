@@ -183,3 +183,5 @@ For production deployments, use:
 ```bash
 npx prisma migrate deploy
 ```
+
+Production Checklist: https://supabase.com/docs/guides/deployment/going-into-prod

@@ -75,8 +75,11 @@ async function handleStatusUpdate(webhookData: WebhookData) {
           );
           throw new Error("INSUFFICIENT_CREDITS");
         }
-      } catch (error) {
-        if (error.message === "INSUFFICIENT_CREDITS") {
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          error.message === "INSUFFICIENT_CREDITS"
+        ) {
           return {
             messageResponse: {
               error:
