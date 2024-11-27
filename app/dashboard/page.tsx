@@ -62,14 +62,14 @@ export default function OverviewPage() {
         const callsData = await callsResponse.json();
         const transactions = await transactionsResponse.json();
         const creditsData = await creditsResponse.json();
-        setCredits(creditsData.credits[0].amount);
+        setCredits(creditsData.credits[0]?.amount ?? 0);
 
         // Initialize empty arrays for both item types
         let callItems: TimelineItem[] = [];
         let transactionItems: TimelineItem[] = [];
 
-        // Only map calls if they exist
-        if (callsData?.calls && callsData.calls.length > 0) {
+        // Only map calls if they exist and have length
+        if (callsData?.calls?.length > 0) {
           callItems = callsData.calls.map((call: call) => ({
             type: "call",
             date: call.startedAt,
@@ -77,11 +77,8 @@ export default function OverviewPage() {
           }));
         }
 
-        // Only map transactions if they exist
-        if (
-          transactions?.transactions &&
-          transactions.transactions.length > 0
-        ) {
+        // Only map transactions if they exist and have length
+        if (transactions?.transactions?.length > 0) {
           transactionItems = transactions.transactions.map(
             (transaction: Transaction) => ({
               type: "transaction",
