@@ -24,10 +24,8 @@ export async function GET(request: Request) {
     });
 
     if (!userData?.stripe_customer_id) {
-      return NextResponse.json(
-        { error: "No customer ID found for user" },
-        { status: 404 }
-      );
+      console.log(`No Stripe customer ID found for user ${userId}`);
+      return NextResponse.json({ transactions: [] });
     }
 
     // Get all payments for the customer

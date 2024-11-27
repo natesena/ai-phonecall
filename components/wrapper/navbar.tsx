@@ -49,7 +49,14 @@ export default function Navbar() {
           </Link>
           {userId && (
             <Link href="/dashboard" legacyBehavior passHref>
-              <Button variant="ghost">Dash-ing-board</Button>
+              <Button
+                variant="default"
+                className="font-semibold hover:scale-105 transition-transform relative rounded-xl bg-white text-black"
+              >
+                <div className="absolute inset-[-2px] rounded-xl bg-[repeating-linear-gradient(45deg,red,red_10px,white_10px,white_20px)] animate-[candy-stripe_1.5s_linear_infinite]" />
+                <div className="absolute inset-[1px] rounded-lg bg-white" />
+                <span className="relative">Dash-ing-board</span>
+              </Button>
             </Link>
           )}
         </NavigationMenuList>

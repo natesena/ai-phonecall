@@ -36,11 +36,6 @@ async function handleStatusUpdate(webhookData: WebhookData) {
   switch (status) {
     case "in-progress":
       try {
-        // {
-        //   "messageResponse": {
-        //     "error": "error"
-        //   }
-        // }
         await prisma.call.create({
           data: {
             callId: callId,
