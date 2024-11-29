@@ -47,7 +47,7 @@ export default function Footer() {
                 <p className="font-medium ">Socials</p>
 
                 <ul className="mt-6 space-y-4 text-sm">
-                  <li>
+                  {/* <li>
                     <Link
                       href="https://twitter.com/rasmickyy"
                       target="_blank"
@@ -56,10 +56,10 @@ export default function Footer() {
                       {" "}
                       Twitter{" "}
                     </Link>
-                  </li>
+                  </li> */}
                   <li>
                     <Link
-                      href="https://www.youtube.com/@rasmic"
+                      href="https://www.youtube.com/shorts/uz_J-mf8Nb0"
                       target="_blank"
                       className="  transition hover:opacity-75"
                     >
@@ -79,20 +79,26 @@ export default function Footer() {
                       target="_blank"
                       href="/terms"
                       rel="noopener noreferrer"
-                      className="  transition hover:opacity-75"
+                      className="transition hover:opacity-75"
                     >
-                      {" "}
-                      Terms & Conditions{" "}
+                      Terms & Conditions
                     </Link>
                   </li>
                   <li>
                     <Link
                       href="/privacy"
-                      className="  transition hover:opacity-75"
+                      className="transition hover:opacity-75"
                     >
-                      {" "}
-                      Privacy Policy{" "}
+                      Privacy Policy
                     </Link>
+                  </li>
+                  <li>
+                    <a
+                      href="mailto:callsantashop@gmail.com"
+                      className="transition hover:opacity-75"
+                    >
+                      Support
+                    </a>
                   </li>
                 </ul>
               </div>
