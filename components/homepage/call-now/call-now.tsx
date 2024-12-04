@@ -1,27 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
-import { loadStripe } from "@stripe/stripe-js";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Band } from "@/components/homepage/band";
-import PricingCard from "./pricing-card";
+import { useState, useEffect } from "react";
+import { loadStripe } from "@stripe/stripe-js";
 import { ConsentModal } from "@/components/consent/consent-modal";
 import { privacyv0 } from "@/app/privacy/_versions/v0_privacy";
 import { termsv0 } from "@/app/terms/_versions/v0_terms";
 
-export default function Pricing() {
+export default function CallNow() {
   const { user } = useUser();
-
-  if (process.env.NODE_ENV === "development") {
-    console.log("Rendering Pricing component");
-    console.log("Environment variables:", {
-      stripeKey: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
-      priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID,
-      prodId: process.env.NEXT_PUBLIC_3_CALL_PROD_ID,
-    });
-  }
-
+  const router = useRouter();
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState<{
@@ -90,55 +81,40 @@ export default function Pricing() {
     }
   };
 
-  const handleCheckout = async (price: number, priceId: string) => {
+  const handleClick = async () => {
+    if (!user?.id) {
+      router.push(
+        `/sign-up?redirect=checkout&price=5&priceId=${process.env.NEXT_PUBLIC_3_CALL_PRICE_ID}`
+      );
+      return;
+    }
+
     const { hasTermsConsent, hasPrivacyConsent } = await checkExistingConsent();
 
     if (hasTermsConsent && hasPrivacyConsent) {
-      // If user has already consented, proceed directly to checkout
-      proceedToCheckout(price, priceId);
+      proceedToCheckout(5, process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string);
     } else {
-      // If user hasn't consented, show the modal
-      setPendingCheckout({ price, priceId });
+      setPendingCheckout({
+        price: 5,
+        priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string,
+      });
       setShowConsentModal(true);
     }
   };
 
-  const plans = [
-    {
-      title: "Call Santa",
-      price: 5,
-      description:
-        "Speak with jolly old St.Nick, powered by AI! Every call is unique and personalized to you.",
-      features: [
-        "3x 2 minute calls with Santa",
-        "No milk & cookies necessary",
-        "Chimney-proof guarantee",
-      ],
-      priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID as string,
-      productId: process.env.NEXT_PUBLIC_3_CALL_PROD_ID as string,
-      actionLabel: "Buy Credit",
-    },
-  ];
-
   return (
-    <div className="pricing-section relative w-full z-[5] mt-4">
-      <div className="band-container absolute left-0 top-1/2 -translate-y-1/2 w-full overflow-x-hidden">
-        <Band />
+    <>
+      <div
+        className="flex justify-center items-center cursor-pointer hover:opacity-90 transition-opacity"
+        onClick={handleClick}
+      >
+        <Image
+          src="/images/homepage/call-now.png"
+          alt="call count background"
+          width={500}
+          height={500}
+        />
       </div>
-      <section className="relative z-10 flex flex-row justify-center gap-8 w-full">
-        {plans.map((plan) => {
-          if (!plan.priceId) return null;
-          return (
-            <div className="relative" key={plan.title}>
-              <PricingCard
-                user={user}
-                handleCheckout={handleCheckout}
-                {...plan}
-              />
-            </div>
-          );
-        })}
-      </section>
 
       <ConsentModal
         isOpen={showConsentModal}
@@ -153,6 +129,6 @@ export default function Pricing() {
           }
         }}
       />
-    </div>
+    </>
   );
 }

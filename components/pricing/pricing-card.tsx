@@ -33,6 +33,18 @@ export default function PricingCard({
   priceId,
 }: PricingCardProps) {
   const router = useRouter();
+
+  const handleClick = () => {
+    if (!user?.id) {
+      router.push(
+        `/sign-up?redirect=checkout&price=${price}&priceId=${priceId}`
+      );
+      return;
+    }
+
+    handleCheckout(price, priceId);
+  };
+
   return (
     <div className="relative">
       <div className="shiny-border rounded-lg p-[20px]">
@@ -43,7 +55,10 @@ export default function PricingCard({
                 {title}
               </CardTitle>
 
-              <div className="flex gap-0.5">${price}</div>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-4xl font-bold">$</span>
+                <span className="text-5xl font-bold">{price}</span>
+              </div>
               <CardDescription className="pt-1.5 h-12">
                 {description}
               </CardDescription>
@@ -56,21 +71,7 @@ export default function PricingCard({
           </div>
           <CardFooter className="mt-2">
             <Button
-              onClick={() => {
-                if (user?.id) {
-                  handleCheckout(price, priceId);
-                } else {
-                  toast("Please login or sign up to purchase", {
-                    description: "You must be logged in to make a purchase",
-                    action: {
-                      label: "Sign Up",
-                      onClick: () => {
-                        router.push("/sign-up");
-                      },
-                    },
-                  });
-                }
-              }}
+              onClick={handleClick}
               className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
               type="button"
             >
