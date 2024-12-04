@@ -9,6 +9,8 @@ import HowTo from "@/components/homepage/howto/howto";
 import ReviewCarousel from "@/components/homepage/reviews/reviewCarousel";
 import Sleigh from "@/components/homepage/decoration/sleigh";
 import prisma from "@/lib/prisma";
+import { YouTubeSection } from "@/components/homepage/youtube/youtube";
+
 import { formatNumber } from "@/lib/utils";
 
 async function getCallCount() {
@@ -35,13 +37,17 @@ export default async function Home() {
             <SnowScene />
           </div>
           <div className="home-page-section relative z-10 min-h-[calc(100vh-var(--navbar-height))]">
+            {/* in the below DIV,on mobile just the hero section and pricing section in one height, on desktop they are separate */}
             <div className="min-h-[calc(100svh-var(--navbar-height))] sm:min-h-0">
               <div className="hero-section-container flex flex-col justify-center items-center w-full p-3">
                 <HeroSection />
               </div>
-              <div className="pricing-section-container flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
-                <Pricing />
+              <div className="flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
+                <YouTubeSection />
               </div>
+              {/* <div className="pricing-section-container flex flex-col justify-center items-center w-full mt-[1rem] sm:mt-[3rem]">
+                <Pricing />
+              </div> */}
             </div>
             <div className="call-counter flex flex-col justify-center items-center max-w-full relative overflow-x-clip">
               <div className="sleigh-component-container absolute transform -translate-x-[25%] translate-y-[50%] sleigh-diagonal">
@@ -58,6 +64,9 @@ export default async function Home() {
         </div>
         <div className="flex flex-col justify-center items-center w-full p-3 my-[5rem] sm:my-[7rem]">
           <HowTo />
+        </div>
+        <div>
+          <Pricing />
         </div>
         <div className="relative bg-[#7F0000] faq-section flex justify-center items-center w-full">
           <AccordionComponent />

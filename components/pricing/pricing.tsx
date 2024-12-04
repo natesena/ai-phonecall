@@ -12,6 +12,16 @@ import { termsv0 } from "@/app/terms/_versions/v0_terms";
 
 export default function Pricing() {
   const { user } = useUser();
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("Rendering Pricing component");
+    console.log("Environment variables:", {
+      stripeKey: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
+      priceId: process.env.NEXT_PUBLIC_3_CALL_PRICE_ID,
+      prodId: process.env.NEXT_PUBLIC_3_CALL_PROD_ID,
+    });
+  }
+
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [pendingCheckout, setPendingCheckout] = useState<{

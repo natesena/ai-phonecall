@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Loading } from "@/components/loading";
 import CheckoutFlow from "@/components/checkout-flow/checkout-flow";
-import { Phone } from "lucide-react";
 import { SantaCallCard } from "@/components/dashboard/santa-call-card";
 
 interface CreditType {

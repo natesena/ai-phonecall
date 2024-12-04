@@ -7,8 +7,8 @@ export default function HeroSection() {
         Call Santa
         {/* <span className="text-3xl"> . Shop</span> */}
       </h1>
-      <p className="hero-subtitle lobster-regular text-2xl text-white">
-        You call, Santa Answers!
+      <p className="hero-subtitle lobster-regular text-center text-2xl sm:text-4xl text-white">
+        No Scripts, Just Magic—Every Chat with Santa is One of a Kind.
       </p>
     </section>
   );
