@@ -13,12 +13,19 @@ export const YouTubeSection = () => {
           alt="Santa on phone"
           width={200}
           height={200}
-          className="absolute -top-20 left-0 sm:-left-[100px] z-0 max-w-[150px] sm:max-w-[200px] sm:rotate-[-40deg]"
+          className={`
+            absolute z-0
+            ${[
+              "left-[-30px] max-w-[150px] rotate-[-20deg] -top-[80px]", // mobile styles with 10 degrees rotation
+              "sm:-left-[100px] sm:max-w-[200px] sm:rotate-[-40deg] sm:-top-20", // desktop styles
+            ].join(" ")}
+          `}
         />
         <div className="relative aspect-video w-full">
           <iframe
-            className="relative z-10 w-full h-full"
-            src="https://www.youtube.com/embed/41KB61r7p0w?si=aOAL7e4LxkbDrR0S"
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/20ctiZ4UUGo?si=obHzeQaisKLqb9fU"
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -27,6 +34,10 @@ export const YouTubeSection = () => {
           ></iframe>
         </div>
       </div>
+      <h2 className="lobster-regular text-center text-4xl sm:text-6xl text-white mx-auto mt-8 sm:mt-12 px-4 [text-shadow:_2px_2px_0_rgb(0_0_0_/_40%)]">
+        The world&apos;s first Santa powered by{" "}
+        <span className="font-arial font-bold text-6xl">AI</span>
+      </h2>
     </div>
   );
 };

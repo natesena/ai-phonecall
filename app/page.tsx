@@ -26,7 +26,7 @@ export default async function Home() {
           </div>
           <div className="home-page-section relative z-10 min-h-[calc(100vh-var(--navbar-height))]">
             {/* in the below DIV,on mobile just the hero section and pricing section in one height, on desktop they are separate */}
-            <div className="min-h-[calc(100svh-var(--navbar-height))] sm:min-h-0">
+            <div className="sm:min-h-0">
               <div className="hero-section-container flex flex-col justify-center items-center w-full p-3">
                 <HeroSection />
               </div>

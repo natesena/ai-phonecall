@@ -103,6 +103,10 @@ main {
   font-style: normal;
 }
 
+.font-arial {
+  font-family: Arial, sans-serif;
+}
+
 .hero-title,
 .hero-subtitle {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
