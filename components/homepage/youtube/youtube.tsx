@@ -23,8 +23,7 @@ export const YouTubeSection = () => {
         />
         <div className="relative aspect-video w-full">
           <iframe
-            width="560"
-            height="315"
+            className="absolute top-0 left-0 w-full h-full"
             src="https://www.youtube.com/embed/20ctiZ4UUGo?si=obHzeQaisKLqb9fU"
             title="YouTube video player"
             frameBorder="0"
