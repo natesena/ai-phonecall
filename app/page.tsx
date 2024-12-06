@@ -2,9 +2,7 @@ import { AccordionComponent } from "@/components/homepage/accordion-component";
 import HeroSection from "@/components/homepage/hero-section";
 import Pricing from "@/components/pricing/pricing";
 import PageWrapper from "@/components/wrapper/page-wrapper";
-import config from "@/config";
 import SnowScene from "@/components/homepage/three/snowScene";
-import AudioPlayer from "@/components/homepage/audio-player";
 import HowTo from "@/components/homepage/howto/howto";
 import ReviewCarousel from "@/components/homepage/reviews/reviewCarousel";
 import Sleigh from "@/components/homepage/decoration/sleigh";
@@ -16,9 +14,6 @@ import Image from "next/image";
 export default async function Home() {
   return (
     <PageWrapper showFooter={true}>
-      <div className="fixed bottom-4 right-4 z-50">
-        <AudioPlayer />
-      </div>
       <div className="home-page-container">
         <div className="relative">
           <div className="threejs-container absolute inset-0 z-0">

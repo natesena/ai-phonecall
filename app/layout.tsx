@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import Script from "next/script";
+import TiktokPixel from "@/components/pixels/tiktok-pixel";
 import "./globals.css";
 
 const siteDescription = "Have a real phone call with Santa.";
@@ -70,6 +71,7 @@ export default function RootLayout({
               gtag('config', 'AW-16801404348');
             `}
           </Script>
+          <TiktokPixel />
         </head>
         <body className={GeistSans.className}>
           <Provider>
