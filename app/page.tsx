@@ -10,7 +10,6 @@ import CallNow from "@/components/homepage/call-now/call-now";
 import { YouTubeSection } from "@/components/homepage/youtube/youtube";
 // import CallCount from "@/components/homepage/call-count/call-count";
 
-import Image from "next/image";
 export default async function Home() {
   return (
     <PageWrapper showFooter={true}>

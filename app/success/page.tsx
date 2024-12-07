@@ -4,6 +4,7 @@ import Stripe from "stripe";
 import PageWrapper from "@/components/wrapper/page-wrapper";
 import Santa from "./_background/santa";
 import { Phone } from "lucide-react";
+import Script from "next/script";
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -15,11 +16,28 @@ export default async function SuccessPage(props: {
   const searchParams = await props.searchParams;
 
   const session = await stripe.checkout.sessions.retrieve(
-    searchParams?.session_id as string
+    searchParams?.session_id as string,
+    {
+      expand: ["payment_intent"],
+    }
   );
+
+  // Get the transaction ID from the payment intent
+  const transactionId =
+    (session.payment_intent as Stripe.PaymentIntent)?.id || "";
 
   return (
     <PageWrapper>
+      <Script id="google-ads-conversion" strategy="afterInteractive">
+        {`
+          gtag('event', 'conversion', {
+            'send_to': 'AW-16801404348/rTXtCKnQ2_AZELyrxMs-',
+            'value': 1.0,
+            'currency': 'USD',
+            'transaction_id': '${transactionId}'
+          });
+        `}
+      </Script>
       <div className="min-h-[calc(100vh-var(--navbar-height))] flex items-center justify-center relative">
         {/* Santa component in background */}
         <div className="absolute inset-0 flex items-center justify-center">
