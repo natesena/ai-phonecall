@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://www.callsanta.shop", "https://*.vercel.app"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]

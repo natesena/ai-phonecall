@@ -24,12 +24,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*.local
 .env
+.env*.local
+.env*.production
 
 # vercel
 .vercel
+
+webhooks/
+webhooks/*
+webhooks/*.json
 
 # typescript
 *.tsbuildinfo

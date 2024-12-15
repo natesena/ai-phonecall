@@ -1,6 +1,14 @@
+// zod is used to validate the data types of the user data
 import { z } from "zod";
 
-export type userCreateProps = z.infer<typeof userCreateSchema>;
+export type userCreateProps = {
+  email: string;
+  first_name: string;
+  last_name: string;
+  user_id: string;
+  profile_image_url?: string;
+  phone_number?: string;
+};
 
 const userCreateSchema = z.object({
   email: z.string().email({ message: "Invalid email" }).describe("user email"),
