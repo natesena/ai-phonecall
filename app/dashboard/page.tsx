@@ -1,78 +1,170 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ArrowUpRight } from "lucide-react";
-import Link from "next/link";
+"use client";
 
-export default async function Dashboard() {
+import { useState, useEffect } from "react";
+import { format, parseISO } from "date-fns";
+import CallLog from "@/app/dashboard/calls/_components/CallLog";
+import TransactionItem from "./transactions/_components/TransactionItem";
+import { Loading } from "@/components/loading";
+import ErrorPage from "@/components/errorpage/ErrorPage";
+import { useAuth } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
+import type { call } from ".prisma/client";
+import CheckoutFlow from "@/components/checkout-flow/checkout-flow";
+import { SantaCallCard } from "@/components/dashboard/santa-call-card";
+
+interface Transaction {
+  stripe_id: string;
+  payment_time: string;
+  amount: number;
+  currency: string;
+}
+
+interface TimelineItem {
+  type: "call" | "transaction";
+  date: string;
+  data: any;
+}
+
+interface CallsResponse {
+  calls: call[];
+}
+
+const santaPhoneNumber = process.env.NEXT_PUBLIC_SANTA_PHONE_NUMBER!;
+
+export default function OverviewPage() {
+  const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [credits, setCredits] = useState(0);
+  const { userId } = useAuth();
+  const { user } = useUser();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.phoneNumbers?.[0]) return;
+
+      try {
+        setLoading(true);
+        const number = user.phoneNumbers[0].phoneNumber;
+
+        // Fetch calls, transactions, and credits
+        const [callsResponse, transactionsResponse, creditsResponse] =
+          await Promise.all([
+            fetch(`/api/calls`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ phoneNumber: number }),
+            }),
+            fetch("/api/payments/query"),
+            fetch("/api/credits"),
+          ]);
+
+        const callsData = await callsResponse.json();
+        const transactions = await transactionsResponse.json();
+        const creditsData = await creditsResponse.json();
+        setCredits(creditsData.credits[0]?.amount ?? 0);
+
+        // Initialize empty arrays for both item types
+        let callItems: TimelineItem[] = [];
+        let transactionItems: TimelineItem[] = [];
+
+        // Only map calls if they exist and have length
+        if (callsData?.calls?.length > 0) {
+          callItems = callsData.calls.map((call: call) => ({
+            type: "call",
+            date: call.startedAt,
+            data: call,
+          }));
+        }
+
+        // Only map transactions if they exist and have length
+        if (transactions?.transactions?.length > 0) {
+          transactionItems = transactions.transactions.map(
+            (transaction: Transaction) => ({
+              type: "transaction",
+              date: transaction.payment_time,
+              data: transaction,
+            })
+          );
+        }
+
+        // Combine and sort all items by date
+        const allItems = [...callItems, ...transactionItems].sort(
+          (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
+        );
+
+        setTimelineItems(allItems);
+      } catch (err) {
+        setError("Failed to fetch timeline data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user, userId]);
+
+  // Group items by date
+  const groupedItems = timelineItems.reduce(
+    (groups: { [key: string]: TimelineItem[] }, item) => {
+      const date = format(parseISO(item.date), "yyyy-MM-dd");
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(item);
+      return groups;
+    },
+    {}
+  );
+
+  if (loading) return <Loading />;
+  if (error) return <ErrorPage />;
+
   return (
-    <div className="flex flex-col justify-center items-start flex-wrap px-4 pt-4 gap-4">
-      <Card className="w-[20rem]">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Welcome to Nextjs Starter Kit
-          </CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">100</div>
-          <p className="text-xs text-muted-foreground">
-            Enter your subtitle here
-          </p>
-        </CardContent>
-      </Card>
-      <div className="grid md:grid-cols-2 sm:grid-cols-1 w-full gap-3">
-        <Card className="">
-          <CardHeader className="flex flex-row items-center">
-            <div className="grid gap-2">
-              <CardTitle>Latest Projects</CardTitle>
-              <CardDescription>
-                Recent projects generated by Nextjs Starter Kit
-              </CardDescription>
-            </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="/dashboard/projects">
-                View All
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-              {" "}
-              {/* Adjust maxHeight according to your design */}
-              <main className="flex flex-col gap-2 lg:gap-2 h-[300px] w-full">
-                <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
-                  <div className="flex flex-col items-center text-center">
-                    <h1 className="text-xl font-bold tracking-tight">
-                      You have no projects
-                    </h1>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Projects will show when you start using Nextjs Starter Kit
-                    </p>
+    <div className="dashboard-page container mx-auto max-w-4xl space-y-8 p-6">
+      <h1 className="text-2xl font-bold mb-6 text-white text-shadow-lg">
+        Activity Overview
+      </h1>
+      {timelineItems.length === 0 ? (
+        <div className="space-y-8">
+          <CheckoutFlow
+            title="Start Your Santa Journey"
+            description="Purchase credits to begin making magical calls with Santa"
+            buttonText="Get Your First Credits"
+          />
+        </div>
+      ) : (
+        <>
+          {credits > 0 ? (
+            <SantaCallCard phoneNumber={santaPhoneNumber} />
+          ) : (
+            <CheckoutFlow
+              title="Get More Credits"
+              description="Purchase more credits to continue making magical calls with Santa"
+              buttonText="Get More Credits"
+            />
+          )}
+          {Object.entries(groupedItems).map(([date, items]) => (
+            <div key={date}>
+              <h3 className="text-lg font-semibold mb-4 text-white text-shadow-lg">
+                {format(parseISO(date), "MMMM d, yyyy")}
+              </h3>
+              <div className="space-y-4">
+                {items.map((item, index) => (
+                  <div key={index}>
+                    {item.type === "call" ? (
+                      <CallLog call={item.data} />
+                    ) : (
+                      <TransactionItem transaction={item.data} />
+                    )}
                   </div>
-                </div>
-              </main>
+                ))}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          ))}
+        </>
+      )}
     </div>
   );
 }

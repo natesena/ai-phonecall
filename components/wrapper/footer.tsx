@@ -1,27 +1,23 @@
-"use client"
-import { useForm } from 'react-hook-form';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import Link from 'next/link';
+"use client";
+import { useForm } from "react-hook-form";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function Footer() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
 
-
-    const onSubmit = async (data: any) => {
-
-
-    };
-    return (
-        <footer className="border-t dark:bg-black">
-            <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-                <div className="lg:grid lg:grid-cols-2">
-                    <div
+  const onSubmit = async (data: any) => {};
+  return (
+    <footer className="border-t dark:bg-black bg-white">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+        <div className="lg:grid lg:grid-cols-2">
+          {/* <div
                         className="border-b   py-8 lg:order-last lg:border-b-0 lg:border-s lg:py-16 lg:ps-16"
                     >
                         <div className="mt-8 space-y-4 lg:mt-0">
@@ -43,57 +39,101 @@ export default function Footer() {
                                 </Button>
                             </form>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="py-8 lg:py-16 lg:pe-16">
+          <div className="py-8 lg:py-16 lg:pe-16">
+            <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div>
+                <p className="font-medium ">Socials</p>
 
+                <ul className="mt-6 space-y-4 text-sm">
+                  {/* <li>
+                    <Link
+                      href="https://twitter.com/rasmickyy"
+                      target="_blank"
+                      className="transition hover:opacity-75"
+                    >
+                      {" "}
+                      Twitter{" "}
+                    </Link>
+                  </li> */}
+                  <li>
+                    <Link
+                      href="https://www.youtube.com/shorts/uz_J-mf8Nb0"
+                      target="_blank"
+                      className="  transition hover:opacity-75"
+                    >
+                      {" "}
+                      YouTube{" "}
+                    </Link>
+                  </li>
+                </ul>
+              </div>
 
-                        <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div>
+                <p className="font-medium ">Helpful Links</p>
 
-                            <div>
-                                <p className="font-medium ">Socials</p>
-
-                                <ul className="mt-6 space-y-4 text-sm">
-                                    <li>
-                                        <Link href="https://twitter.com/rasmickyy" target="_blank" className="transition hover:opacity-75"> Twitter </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="https://www.youtube.com/@rasmic" target="_blank" className="  transition hover:opacity-75"> YouTube </Link>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div>
-                                <p className="font-medium ">Helpful Links</p>
-
-                                <ul className="mt-6 space-y-4 text-sm">
-                                    <li>
-                                        <Link target="_blank" href="/" rel="noopener noreferrer" className="  transition hover:opacity-75"> Docs </Link>
-                                    </li>
-                                    <li>
-                                        <Link href="/" className="  transition hover:opacity-75"> Methodology </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 border-t   pt-8">
-                            <ul className="flex flex-wrap gap-4 text-xs">
-                                <li>
-                                    <a href="/" target="_blank" className="transition hover:opacity-75">Terms & Conditions </a>
-                                </li>
-
-                                <li>
-                                    <a href="/" target="_blank" className="transition hover:opacity-75">Privacy Policy </a>
-                                </li>
-                            </ul>
-
-                            <p className="mt-8 text-xs  ">&copy; 2024. SomeCompany LLC. All rights reserved.</p>
-                        </div>
-                    </div>
-                </div>
+                <ul className="mt-6 space-y-4 text-sm">
+                  <li>
+                    <Link
+                      target="_blank"
+                      href="/terms"
+                      rel="noopener noreferrer"
+                      className="transition hover:opacity-75"
+                    >
+                      Terms & Conditions
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/privacy"
+                      className="transition hover:opacity-75"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <a
+                      href="mailto:callsantashop@gmail.com"
+                      className="transition hover:opacity-75"
+                    >
+                      Support
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
-        </footer>
 
-    )
+            <div className="mt-8 border-t   pt-8">
+              <ul className="flex flex-wrap gap-4 text-xs">
+                <li>
+                  <a
+                    href="/"
+                    target="_blank"
+                    className="transition hover:opacity-75"
+                  >
+                    Terms & Conditions{" "}
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="/"
+                    target="_blank"
+                    className="transition hover:opacity-75"
+                  >
+                    Privacy Policy{" "}
+                  </a>
+                </li>
+              </ul>
+
+              <p className="mt-8 text-xs  ">
+                &copy; 2024. TheNewCreative LLC. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 }

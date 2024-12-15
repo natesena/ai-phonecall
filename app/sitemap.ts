@@ -1,8 +1,3 @@
-type BlogPost = {
-  slug: string;
-  created_at: string;
-};
-
 type SitemapEntry = {
   url: string;
   lastModified: string;
@@ -18,22 +13,16 @@ type SitemapEntry = {
 };
 
 export default async function sitemap(): Promise<SitemapEntry[]> {
-  const baseUrl = "https://starter.rasmic.xyz";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   const staticPages: SitemapEntry[] = [
     {
       url: baseUrl,
       lastModified: new Date().toISOString(),
-      changeFrequency: "monthly",
+      changeFrequency: "daily",
       priority: 1,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date().toISOString(),
-      changeFrequency: "weekly",
-      priority: 0.8,
     },
   ];
 
-  return [...staticPages];
+  return staticPages;
 }
