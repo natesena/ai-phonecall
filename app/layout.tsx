@@ -7,6 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import Script from "next/script";
 import TiktokPixel from "@/components/pixels/tiktok-pixel";
+import HotjarPixel from "@/components/pixels/hotjar-pixel";
 import "./globals.css";
 
 const siteDescription = "Have a real phone call with Santa.";
@@ -72,6 +73,7 @@ export default function RootLayout({
             `}
           </Script>
           <TiktokPixel />
+          <HotjarPixel />
         </head>
         <body className={GeistSans.className}>
           <Provider>
