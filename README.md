@@ -1,7 +1,6 @@
 # Getting Started
 
 ## Prerequisites
-
 - Node.js and yarn/bun installed
 - Accounts and API keys for:
   - Supabase
@@ -11,21 +10,18 @@
 ## Setup
 
 1. Clone the repository:
-
    ```
    git clone <repository-url>
    cd <project-directory>
    ```
 
 2. Install dependencies:
-
    ```
    yarn
    ```
 
 3. Set up environment variables:
    Create a `.env` file in the root directory with the following variables:
-
    ```
    SUPABASE_URL=<your-supabase-project-url>
    SUPABASE_SERVICE_KEY=<your-supabase-service-key>
@@ -45,7 +41,6 @@
 
 4. Configure features:
    In `config.ts`, set the desired features:
-
    ```typescript
    const config = {
      auth: {
@@ -59,13 +54,11 @@
 
 5. Set up the database:
    Run Prisma migrations:
-
    ```
    npx prisma migrate dev
    ```
 
 6. Start the development server:
-
    ```
    yarn dev
    ```
@@ -142,7 +135,6 @@
 ## Learn More
 
 Refer to the documentation of the individual technologies used in this project for more detailed information:
-
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [Supabase Documentation](https://supabase.io/docs)
