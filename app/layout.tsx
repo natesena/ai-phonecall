@@ -10,7 +10,6 @@ import TiktokPixel from "@/components/pixels/tiktok-pixel";
 import "./globals.css";
 import { getServerSession } from 'next-auth'
 import { nextAuthOptions } from '@/lib/auth/next-auth-options'
-import ProtectedRoute from "@/utils/protected-route";
 const siteDescription = "Have a real phone call with Santa.";
 const siteName = "CallSanta.Shop";
 
@@ -47,7 +46,6 @@ export default async function RootLayout({
     children: React.ReactNode;
   }) {
       const session = await getServerSession(nextAuthOptions);
-      console.log(session)
     return (
       <AuthWrapper session={session}>
       <html lang="en" suppressHydrationWarning>

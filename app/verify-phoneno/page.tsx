@@ -14,18 +14,18 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { useUser } from "@/hooks/use-user";
-import { useSession } from "next-auth/react";
+import PageWrapper from "@/components/wrapper/page-wrapper";
+import Image from "next/image";
 const VerifyPhoneNO = () => {
   const [otpValue, setOtpValue] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
   const { user, getUser } = useUser();
 
-  const { toast } = useToast();
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -47,20 +47,12 @@ const VerifyPhoneNO = () => {
       const data = await response.json();
 
       if (response.ok && data?.sent) {
-        toast({
-          title: "OTP Sent",
-          description: "An OTP has been sent to your phone number.",
-        });
+        toast.success("OTP sent successfully");
       } else {
         throw new Error("Failed to send OTP");
       }
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      toast({
-        variant: "destructive",
-        title: "OTP Sent Failed",
-        description: "Unable to send OTP. Please try again later.",
-      });
+      toast.error("Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -68,10 +60,7 @@ const VerifyPhoneNO = () => {
 
   const verifyOTP = async () => {
     if (!otpValue) {
-      return toast({
-        variant: "destructive",
-        title: "Please enter OTP",
-      });
+      return toast.info("Please enter the OTP");
     }
 
     try {
@@ -83,7 +72,7 @@ const VerifyPhoneNO = () => {
       const data = await response.json();
 
       if (response.ok && data?.verified) {
-        toast({ title: "OTP Verified" });
+        toast.success("OTP verified successfully");
 
           router.push("/");
           getUser();
@@ -91,31 +80,34 @@ const VerifyPhoneNO = () => {
         throw new Error("OTP verification failed");
       }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
-      toast({
-        variant: "destructive",
-        title: "OTP Verification Failed",
-        description: "Please try again later.",
-      });
+      toast.error("Failed to verify OTP");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <PageWrapper>
+    <div className="w-full mx-auto overflow-hidden text-black max-w-sm mt-20">
       <div className="w-full max-w-sm">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Verify Phone Number</CardTitle>
-            <CardDescription>Enter the OTP sent to your phone number</CardDescription>
-          </CardHeader>
+      <Card className="w-full mx-auto bg-white overflow-hidden text-black max-w-sm mt-20">
+      <CardHeader className="flex flex-col justify-center items-center">
+          <Image
+            src="/images/homepage/santa.avif"
+            width={100}
+            height={100}
+            alt="Santa icon"
+            className="w-16 h-16 mx-auto"
+          />
+          <CardTitle className="text-xl">Verify Phone Number</CardTitle>
+          <CardDescription>Enter the OTP sent to your phone number.</CardDescription>
+        </CardHeader>
           <CardContent className="grid gap-4">
             <div className="flex justify-center space-y-2">
               <InputOTP
                 maxLength={6}
                 value={otpValue}
-                onChange={(value) => setOtpValue(value)}
+                onChange={(value: any) => setOtpValue(value)}
               >
                 <InputOTPGroup>
                   {[...Array(6)].map((_, index) => (
@@ -126,13 +118,14 @@ const VerifyPhoneNO = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" onClick={verifyOTP} disabled={loading}>
+            <Button className="w-full mt-4 bg-neutral-700 hover:bg-neutral-800 py-1 text-white" onClick={verifyOTP} disabled={loading}>
               {loading ? "Loading..." : "Verify"}
             </Button>
           </CardFooter>
         </Card>
       </div>
     </div>
+    </PageWrapper>
   );
 };
 

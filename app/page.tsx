@@ -8,6 +8,7 @@ import ReviewCarousel from "@/components/homepage/reviews/reviewCarousel";
 import Sleigh from "@/components/homepage/decoration/sleigh";
 import CallNow from "@/components/homepage/call-now/call-now";
 import { YouTubeSection } from "@/components/homepage/youtube/youtube";
+import PhoneVerificationWarning from "@/components/wrapper/phone-verification-warning";
 // import CallCount from "@/components/homepage/call-count/call-count";
 
 export default async function Home() {
@@ -19,6 +20,7 @@ export default async function Home() {
             <SnowScene />
           </div>
           <div className="home-page-section relative z-10 min-h-[calc(100vh-var(--navbar-height))]">
+            <PhoneVerificationWarning />
             {/* in the below DIV,on mobile just the hero section and pricing section in one height, on desktop they are separate */}
             <div className="sm:min-h-0">
               <div className="hero-section-container flex flex-col justify-center items-center w-full p-3">

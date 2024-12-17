@@ -16,7 +16,8 @@ const AuthWrapper = ({ children, session }: AuthWrapperProps) => {
 
   return (
     <SessionProvider session={session}>
-      <ClerkProvider dynamic>{children}</ClerkProvider>
+      <ClerkProvider dynamic>
+        {children}</ClerkProvider>
     </SessionProvider>
   );
 };

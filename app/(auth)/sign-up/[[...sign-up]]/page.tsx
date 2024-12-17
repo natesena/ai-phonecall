@@ -10,106 +10,158 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import PageWrapper from "@/components/wrapper/page-wrapper";
 import { supabase } from "@/utils/supabase";
-
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import Link from "next/link";
 
+const SignInSchema = Yup.object({
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string().required('Password is required'),
+  name: Yup.string().required('Name is required'),
+  phoneNo: Yup.string().required('Phone Number is required'),
+});
+type SchemaType = Yup.InferType<typeof SignInSchema>;
 export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [phoneNo, setPhoneNo] = useState("");
-  const [password, setPassword] = useState("");
-
-  const { toast } = useToast();
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    setLoading(true);
+  const {
+    handleSubmit,
+    handleBlur,
+    values,
+    isSubmitting,
+    setFieldValue,
+  } = useFormik<SchemaType>({
+    validationSchema: SignInSchema,
+    initialValues: {
+      email: '',
+      password: '',
+      name: '',
+      phoneNo: '',
+    },
+    validateOnChange: true,
+    validateOnBlur: true,
+    validateOnMount: true,
+    onSubmit: async (values) => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase.auth.signUp({
+          email: values.email,
+          password: values.password,
+          options: {
+            data: {
+              name: values.name,
+              phone: values.phoneNo,
+            }
+          }
+        });
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      phone: phoneNo,
-      password,
-    });
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
 
-    if (error) {
-      toast({ variant: "destructive", title: error.message });
-      return;
-    }
-
-    await supabase
-      .from("user")
-      .insert({ first_name: name, email: email, id: data?.user?.id });
-
-    router.replace("/sign-in");
-  };
+        if (data.user) {
+          toast.success("Account created successfully!");
+          const res = await supabase
+          .from("user")
+          .insert({ first_name: values.name, email: values.email, id: data?.user?.id, phone: values.phoneNo, isPhoneVerified: false });
+         
+          router.push("/sign-in");
+        }
+      } catch (error: any) {
+        toast.error(error.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
 
   return (
     <PageWrapper>
-      <Card className="w-full max-w-sm mt-20">
-        <CardHeader>
-          <CardTitle className="text-2xl">Register Account</CardTitle>
+      <Card className="w-full mx-auto bg-white overflow-hidden text-black max-w-sm mt-20">
+        <CardHeader className="flex flex-col justify-center items-center">
+          <Image src="/images/homepage/santa.avif" width={100} height={100} alt="santa icon" className="w-16 h-16 mx-auto"/>
+          <CardTitle className="text-xl">Register Account</CardTitle>
           <CardDescription>
             Enter your details below to register new account.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
+        <form onSubmit={handleSubmit}>
+        <CardContent className="grid gap-4 border border-white text-gray-500">
+          <div className="space-y-2">
+            <Label>Name</Label>
             <Input
-              id="name"
               type="text"
-              placeholder="John Doe"
+              placeholder="Enter your name"
               required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              onBlur={handleBlur}
+              value={values.name}
+              onChange={(e) => setFieldValue("name", e.target.value)}
+              className="w-full bg-white border border-gray-300"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+          <div className="space-y-2">
+            <Label>Email</Label>
             <Input
-              id="email"
               type="email"
-              placeholder="john@example.com"
+              placeholder="Enter your email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onBlur={handleBlur}
+              value={values.email}
+              onChange={(e) => setFieldValue("email", e.target.value)}
+              className="w-full bg-white border border-gray-300"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="email">Phone No</Label>
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
             <Input
-              id="phonono"
-              type="text"
-              placeholder="15556664444"
+              type="tel"
+              placeholder="Enter your phone number"
               required
-              value={phoneNo}
-              onChange={(e) => setPhoneNo(e.target.value)}
+              onBlur={handleBlur}
+              value={values.phoneNo}
+              onChange={(e) => setFieldValue("phoneNo", e.target.value)}
+              className="w-full bg-white border border-gray-300"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
+          <div className="space-y-2">
+            <Label>Password</Label>
             <Input
-              id="password"
               type="password"
+              placeholder="Enter your password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onBlur={handleBlur}
+              value={values.password}
+              onChange={(e) => setFieldValue("password", e.target.value)}
+              className="w-full bg-white border border-gray-300"
             />
           </div>
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Loading..." : "Register"}
-          </Button>
+          <Button
+              type="submit"
+              className="w-full mt-4 bg-neutral-700 hover:bg-neutral-800 py-1 text-white"
+              disabled={isSubmitting || loading}
+            >
+              {loading ? "Signing up..." : "Sign up"}
+            </Button>
+          </CardContent>
+        </form>
+        <CardFooter className="flex py-2 flex-col gap-3 bg-gray-200">
+          <h1 className="w-full bg-transparent py-3 text-sm text-center text-gray-500 font-[400]">
+            Already have an account?{" "}
+            <Link href="/sign-in" className="font-semibold ml-2">
+              Sign In
+            </Link>
+          </h1>
         </CardFooter>
       </Card>
     </PageWrapper>

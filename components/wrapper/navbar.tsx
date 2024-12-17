@@ -14,6 +14,7 @@ import config from "@/config";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
+import { useUser } from "@/hooks/use-user";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Marketing Page",
@@ -23,12 +24,17 @@ const components: { title: string; href: string; description: string }[] = [
 ];
 
 export default function Navbar() {
+  const { user } = useUser();
   let userId = null;
   /* eslint-disable react-hooks/rules-of-hooks */
-  if (config?.auth?.enabled) {
-    const user = useAuth();
-    userId = user?.userId;
+  // if (config?.auth?.enabled) {
+  //   const user = useAuth();
+  //   userId = user?.userId;
+  // }
+  if (user?._id) {
+    userId = user._id;
   }
+
 
   return (
     <div className="navbar flex min-w-full fixed justify-between p-2 border-b z-50 dark:bg-black dark:bg-opacity-50 bg-white">

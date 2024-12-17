@@ -1,12 +1,13 @@
-
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { supabase } from "@/utils/supabase";
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const serviceId = process.env.TWILIO_SERVICE_ID!;
 const client = twilio(accountSid, authToken);
+
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,22 +16,38 @@ export async function GET(request: NextRequest) {
       return session;
     };
     const session = await getSession(request);
-
+    console.log({session})
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { data, error } = await supabase.from("user").select()
-    .eq("id", session.id)
-    if (error) {
-        return;
+    // Get user data
+    const { data: userData, error: userError } = await supabase
+      .from("user")
+      .select("*")
+      .eq("id", session.id)
+      .single();
+
+    if (userError || !userData) {
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
     }
-    const user = data[0];
-    // Send OTP
-    const twillioResponse = await client.verify.v2
+
+    if (!userData.phone) {
+      return NextResponse.json(
+        { message: "Phone number not found" },
+        { status: 400 }
+      );
+    }
+
+    // Send OTP via Twilio
+    try {
+        const twillioResponse = await client.verify.v2
       .services(serviceId)
       .verifications.create({
-        to: `${user.phone}`,
+        to: `+2347084557988`,
         channel: "sms",
       });
 
@@ -39,7 +56,15 @@ export async function GET(request: NextRequest) {
     } else {
       return NextResponse.json({ sent: false }, { status: 500 });
     }
+    } catch (twilioError: any) {
+      console.error("Twilio Error:", twilioError);
+      return NextResponse.json(
+        { message: twilioError.message || "Failed to send OTP" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
+    console.error("Server Error:", error);
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 }
