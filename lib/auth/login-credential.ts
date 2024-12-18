@@ -1,5 +1,4 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { supabase } from "@/utils/supabase";
 
 type Input = {
   email: string;
@@ -26,30 +25,25 @@ export const LoginCredential = CredentialsProvider<Credentials>({
 
     const { email, password } = credentials;
 
-    // Supabase authentication
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/signin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     });
 
-    if (error) {
-      throw new Error(error.message);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error);
     }
 
-    const user = data.user;
-
+    const { user } = await response.json();
+    
     if (!user) {
       throw new Error("User not found");
     }
 
-    // Return user data and session information
-    return {
-      id: user.id,
-      email: user.email,
-      phone: user.phone || "",
-      updated_at: user.updated_at,
-      created_at: user.created_at,
-      accessToken: data.session.access_token, // Include the access token
-    };
+    return user;
   },
 });

@@ -6,54 +6,47 @@ import { createServerClient } from "@supabase/ssr";
 export const testSupabaseConnection = async () => {
   console.log("Starting Supabase connection test...");
 
-  // Verify environment variables
+  // Check environment variables
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-    console.log("Environment variables:", {
+    const envInfo = {
       hasUrl: !!process.env.SUPABASE_URL,
       hasKey: !!process.env.SUPABASE_SERVICE_KEY,
       url: process.env.SUPABASE_URL?.substring(0, 10) + "...", // Log first 10 chars for verification
-    });
+    };
+    console.error("Environment variables missing:", envInfo);
     throw new Error("Missing Supabase environment variables");
   }
 
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-      },
-    }
-  );
-
   try {
-    console.log("Testing table access...");
+    // Create Supabase client
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!,
+      {
+        cookies: {}
+      }
+    );
+
+    // Test query
     const { data: testData, error: testError } = await supabase
       .from("user")
       .select("*")
       .limit(1);
 
-    console.log("Select test result:", {
-      success: !testError,
-      data: testData,
-      error: testError,
-    });
+    if (testError) {
+      console.error("Query error:", testError);
+      throw testError;
+    }
 
     return {
-      connection: "success",
-      selectTest: { data: testData, error: testError },
+      success: true,
+      message: "Successfully connected to Supabase",
+      data: {
+        rowCount: testData?.length || 0,
+      },
     };
   } catch (error: any) {
-    console.error("Test failed:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause,
-    });
+    console.error("Connection error:", error);
     throw new Error(`Supabase test failed: ${error.message}`);
   }
 };

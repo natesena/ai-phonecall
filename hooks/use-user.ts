@@ -1,8 +1,6 @@
 "use client";
-import { supabase } from "@/utils/supabase";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
-
 
 interface SessionUser {
   id?: string;
@@ -19,27 +17,28 @@ export const useUser = () => {
       return;
     }
 
-
     const userId = (sessionData.user as SessionUser).id;
     if (!userId) {
       setIsLoaded(true);
       return;
     }
 
-    const { data, error } = await supabase
-      .from("user")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
+    try {
+      const response = await fetch('/api/user');
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Failed to fetch user:', error);
+        setIsLoaded(true);
+        return;
+      }
 
-
-    if (error) {
+      const { user: userData } = await response.json();
+      setUser(userData);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    } finally {
       setIsLoaded(true);
-      return;
     }
-
-    setUser(data);
-    setIsLoaded(true);
   }, [sessionData]);
 
   useEffect(() => {
@@ -49,5 +48,5 @@ export const useUser = () => {
     }
   }, [handleFetchUser, user, sessionData]);
 
-  return { user, getUser: handleFetchUser, isLoaded };
+  return { user, isLoaded, getUser: handleFetchUser };
 };

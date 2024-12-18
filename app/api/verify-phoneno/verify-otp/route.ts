@@ -1,7 +1,8 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
-import { supabase } from "@/utils/supabase";
+import { createServerClient } from "@supabase/ssr";
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const serviceId = process.env.TWILIO_SERVICE_ID!;
@@ -21,11 +22,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { data, error } = await supabase.from("user").select()
-    .eq("user_id", session.id)
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_KEY!,
+      {
+        cookies: {}
+      }
+    );
+
+    const { data, error } = await supabase
+      .from("user")
+      .select()
+      .eq("user_id", session.id);
+
     if (error) {
-        return;
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
+
     const user = data[0];
     const { searchParams } = new URL(request.url);
     const otp = searchParams.get("otp") as string;
@@ -39,17 +52,23 @@ export async function GET(request: NextRequest) {
       });
 
     if (twillioResponse.status === "approved") {
-        const { data, error } = await supabase.from("user").update({ is_phone_verified: true }).eq("id", user.id).select();
-        console.log({data, error})
+      const { error: updateError } = await supabase
+        .from("user")
+        .update({ is_phone_verified: true })
+        .eq("id", user.id);
+
+      if (updateError) {
+        return NextResponse.json({ error: updateError.message }, { status: 400 });
+      }
+
       return NextResponse.json({ verified: true }, { status: 200 });
     } else {
-      return NextResponse.json({ verified: false }, { status: 500 });
+      return NextResponse.json({ verified: false }, { status: 400 });
     }
-  } catch (error) {
-    console.log(error);
-
+  } catch (error: any) {
+    console.error(error);
     return NextResponse.json(
-      { message: "Something went wrong" },
+      { error: error.message || "Something went wrong" },
       { status: 500 }
     );
   }

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import PageWrapper from "@/components/wrapper/page-wrapper";
-import { supabase } from "@/utils/supabase";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -54,31 +53,23 @@ export default function SignUpPage() {
     onSubmit: async (values) => {
       try {
         setLoading(true);
-        const { data, error } = await supabase.auth.signUp({
-          email: values.email,
-          password: values.password,
-          options: {
-            data: {
-              first_name: values.firstName,
-              phone_number: values.phoneNo,
-              last_name: values.lastName
-            }
-          }
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
         });
 
-        if (error) {
-          toast.error(error.message);
+        const data = await response.json();
+
+        if (!response.ok) {
+          toast.error(data.error);
           return;
         }
 
-        if (data.user) {
-          toast.success("Account created successfully!");
-          const res = await supabase
-          .from("user")
-          .insert({ first_name: values.firstName, last_name: values.lastName, email: values.email, user_id: data?.user?.id, phone_number: values.phoneNo, is_phone_verified: false });
-          
-          router.push("/sign-in");
-        }
+        toast.success(data.message);
+        router.push("/sign-in");
       } catch (error: any) {
         toast.error(error.message || "Something went wrong");
       } finally {

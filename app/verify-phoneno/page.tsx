@@ -71,16 +71,19 @@ const VerifyPhoneNO = () => {
       );
       const data = await response.json();
 
-      if (response.ok && data?.verified) {
-        toast.success("OTP verified successfully");
-
-          router.push("/");
-          getUser();
-      } else {
-        throw new Error("OTP verification failed");
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to verify OTP");
       }
-    } catch (error) {
-      toast.error("Failed to verify OTP");
+
+      if (data?.verified) {
+        toast.success("OTP verified successfully");
+        router.push("/");
+        getUser();
+      } else {
+        toast.error("Invalid OTP");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to verify OTP");
     } finally {
       setLoading(false);
     }
