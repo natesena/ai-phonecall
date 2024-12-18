@@ -128,5 +128,4 @@ const VerifyPhoneNO = () => {
     </PageWrapper>
   );
 };
-
 export default VerifyPhoneNO;
