@@ -1,6 +1,5 @@
 "use client";
 import { ReactNode } from "react";
-import { ClerkProvider } from "@clerk/nextjs";
 import config from "@/config";
 import { SessionProvider } from "next-auth/react";
 
@@ -16,8 +15,7 @@ const AuthWrapper = ({ children, session }: AuthWrapperProps) => {
 
   return (
     <SessionProvider session={session}>
-      <ClerkProvider dynamic>
-        {children}</ClerkProvider>
+        {children}
     </SessionProvider>
   );
 };

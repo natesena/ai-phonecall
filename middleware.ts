@@ -16,12 +16,7 @@ export const PUBLIC_ROUTES = [
 ] as const;
 
 export const PROTECTED_SUB_ROUTES = [
-    '/dashboard',
-    '/api/calls',
-    '/api/user',
-    '/user-profile',
-    '/settings',
-    "/verify-phoneno"
+    '*',
 ] as const;
 
 export async function middleware(request: NextRequest) {
