@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useUser } from "@/hooks/use-user";
 const PhoneVerificationWarning = () => {
     const { user } = useUser();
-    if (user?.isPhoneVerified) {
+    if (user?.is_phone_verified || !user) {
         return null;
     }
     return (

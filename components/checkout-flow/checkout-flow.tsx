@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { ConsentModal } from "@/components/consent/consent-modal";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks/use-user";
 import { toast } from "sonner";
 import { termsv0 } from "@/app/terms/_versions/v0_terms";
 import { privacyv0 } from "@/app/privacy/_versions/v0_privacy";

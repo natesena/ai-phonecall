@@ -22,12 +22,11 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await supabase.from("user").select()
-    .eq("id", session.id)
+    .eq("user_id", session.id)
     if (error) {
         return;
     }
     const user = data[0];
-    console.log({user})
     const { searchParams } = new URL(request.url);
     const otp = searchParams.get("otp") as string;
 
@@ -35,12 +34,12 @@ export async function GET(request: NextRequest) {
     const twillioResponse = await client.verify.v2
       .services(serviceId)
       .verificationChecks.create({
-        to: `${user.phone}`,
+        to: `${user.phone_number}`,
         code: otp,
       });
 
     if (twillioResponse.status === "approved") {
-        const { data, error } = await supabase.from("user").update({ isPhoneVerified: true }).eq("id", user.id).select();
+        const { data, error } = await supabase.from("user").update({ is_phone_verified: true }).eq("id", user.id).select();
         console.log({data, error})
       return NextResponse.json({ verified: true }, { status: 200 });
     } else {

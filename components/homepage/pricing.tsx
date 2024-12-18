@@ -13,7 +13,6 @@ import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";

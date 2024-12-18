@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import CallsList from "./_components/CallsList";
 import SyncCalls from "./_components/SyncCalls";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks/use-user";
 import { Loading } from "@/components/loading";
-import type { call } from ".prisma/client";
+import type { call } from "@prisma/client";
 
 export default function CallsPage() {
   const [calls, setCalls] = useState<call[]>([]);

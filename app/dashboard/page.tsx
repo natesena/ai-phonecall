@@ -7,7 +7,7 @@ import TransactionItem from "./transactions/_components/TransactionItem";
 import { Loading } from "@/components/loading";
 import ErrorPage from "@/components/errorpage/ErrorPage";
 import { useAuth } from "@clerk/nextjs";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks/use-user";
 import type { call } from ".prisma/client";
 import CheckoutFlow from "@/components/checkout-flow/checkout-flow";
 import { SantaCallCard } from "@/components/dashboard/santa-call-card";

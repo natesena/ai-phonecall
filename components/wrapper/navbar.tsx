@@ -4,15 +4,12 @@ import * as React from "react";
 import { Button } from "../ui/button";
 import { UserProfile } from "../user-profile";
 import ModeToggle from "../mode-toggle";
-import { TreePine } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import config from "@/config";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
 import Image from "next/image";
 import { useUser } from "@/hooks/use-user";
 const components: { title: string; href: string; description: string }[] = [
@@ -26,8 +23,8 @@ const components: { title: string; href: string; description: string }[] = [
 export default function Navbar() {
   const { user } = useUser();
   let userId = null;
-  if (user?._id) {
-    userId = user._id;
+  if (user?.user_id) {
+    userId = user.user_id;
   }
 
 

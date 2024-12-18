@@ -10,27 +10,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import config from "@/config";
-import { SignOutButton } from "@clerk/nextjs";
-import { CreditCard, LogOut, Settings, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useUser } from "@/hooks/use-user";
+import { signOut } from "next-auth/react";
+import { toast } from "sonner";
 export function UserProfile() {
   const router = useRouter();
-  const session = useSession();
-
-  console.log({session})
-
+  const { user } = useUser();
   if (!config?.auth?.enabled) {
     router.back();
   }
-  const { user } = useUser();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-[2.25rem] h-[2.25rem]">
         <Avatar>
-          <AvatarImage src={user?.imageUrl} alt="User Profile" />
+          <AvatarImage src={user?.profile_image_url} alt="User Profile" />
           <AvatarFallback></AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
@@ -53,13 +50,11 @@ export function UserProfile() {
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
-        <SignOutButton>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => (signOut(), toast.success("Successfully signed out"))}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
-        </SignOutButton>
       </DropdownMenuContent>
     </DropdownMenu>
   );

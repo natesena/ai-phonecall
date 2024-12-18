@@ -2,32 +2,52 @@
 import { supabase } from "@/utils/supabase";
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+
+
+interface SessionUser {
+  id?: string;
+}
+
 export const useUser = () => {
-  const session = getSession();
   const { data: sessionData } = useSession();
 
   const [user, setUser] = useState<any>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const handleFetchUser = useCallback(async () => {
-    if (!sessionData) {
+    if (!sessionData?.user) {
       return;
     }
 
-    const { data, error } = await supabase.from("user").select("*");
 
-    console.log("Error:", data, error);
+    const userId = (sessionData.user as SessionUser).id;
+    if (!userId) {
+      setIsLoaded(true);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("user")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
 
     if (error) {
+      setIsLoaded(true);
       return;
     }
 
-    setUser(data[0]);
-  }, []);
+    setUser(data);
+    setIsLoaded(true);
+  }, [sessionData]);
 
   useEffect(() => {
     if (!user && sessionData) {
+      setIsLoaded(false);
       handleFetchUser();
     }
-  }, []);
-  return { user, getUser: handleFetchUser };
+  }, [handleFetchUser, user, sessionData]);
+
+  return { user, getUser: handleFetchUser, isLoaded };
 };

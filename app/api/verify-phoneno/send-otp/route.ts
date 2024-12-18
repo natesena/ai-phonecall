@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
       return session;
     };
     const session = await getSession(request);
-    console.log({session})
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -25,7 +24,7 @@ export async function GET(request: NextRequest) {
     const { data: userData, error: userError } = await supabase
       .from("user")
       .select("*")
-      .eq("id", session.id)
+      .eq("user_id", session.id)
       .single();
 
     if (userError || !userData) {
@@ -34,8 +33,7 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
-
-    if (!userData.phone) {
+    if (!userData.phone_number) {
       return NextResponse.json(
         { message: "Phone number not found" },
         { status: 400 }
@@ -47,7 +45,7 @@ export async function GET(request: NextRequest) {
         const twillioResponse = await client.verify.v2
       .services(serviceId)
       .verifications.create({
-        to: `+2347084557988`,
+        to: `${userData.phone_number}`,
         channel: "sms",
       });
 

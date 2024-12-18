@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/hooks/use-user";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { Band } from "@/components/homepage/band";

@@ -23,7 +23,8 @@ import Link from "next/link";
 const SignInSchema = Yup.object({
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string().required('Password is required'),
-  name: Yup.string().required('Name is required'),
+  firstName: Yup.string().required('Name is required'),
+  lastName: Yup.string().required('Last Name is required'),
   phoneNo: Yup.string().required('Phone Number is required'),
 });
 type SchemaType = Yup.InferType<typeof SignInSchema>;
@@ -37,13 +38,15 @@ export default function SignUpPage() {
     values,
     isSubmitting,
     setFieldValue,
+    errors
   } = useFormik<SchemaType>({
     validationSchema: SignInSchema,
     initialValues: {
       email: '',
       password: '',
-      name: '',
+      firstName: '',
       phoneNo: '',
+      lastName: ''
     },
     validateOnChange: true,
     validateOnBlur: true,
@@ -56,8 +59,9 @@ export default function SignUpPage() {
           password: values.password,
           options: {
             data: {
-              name: values.name,
-              phone: values.phoneNo,
+              first_name: values.firstName,
+              phone_number: values.phoneNo,
+              last_name: values.lastName
             }
           }
         });
@@ -71,8 +75,8 @@ export default function SignUpPage() {
           toast.success("Account created successfully!");
           const res = await supabase
           .from("user")
-          .insert({ first_name: values.name, email: values.email, id: data?.user?.id, phone: values.phoneNo, isPhoneVerified: false });
-         
+          .insert({ first_name: values.firstName, last_name: values.lastName, email: values.email, user_id: data?.user?.id, phone_number: values.phoneNo, is_phone_verified: false });
+          
           router.push("/sign-in");
         }
       } catch (error: any) {
@@ -96,14 +100,27 @@ export default function SignUpPage() {
         <form onSubmit={handleSubmit}>
         <CardContent className="grid gap-4 border border-white text-gray-500">
           <div className="space-y-2">
-            <Label>Name</Label>
+            <Label>First Name</Label>
             <Input
               type="text"
-              placeholder="Enter your name"
+              placeholder="Enter your first name"
               required
               onBlur={handleBlur}
-              value={values.name}
-              onChange={(e) => setFieldValue("name", e.target.value)}
+              value={values.firstName}
+              onChange={(e) => setFieldValue("firstName", e.target.value)}
+              className="w-full bg-white border border-gray-300"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Last Name</Label>
+            <Input
+              type="text"
+              placeholder="Enter your last name"
+              required
+              onBlur={handleBlur}
+              value={values.lastName}
+              onChange={(e) => setFieldValue("lastName", e.target.value)}
               className="w-full bg-white border border-gray-300"
             />
           </div>
